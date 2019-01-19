@@ -1,0 +1,16 @@
+name: Arena
+main: AndreasHGK\Arena\Arena
+version: 0.0.1
+api: 3.5.5
+load: POSTWORLD
+author: AndreasHGK
+description: A PMMP arena plugin
+
+permissions:
+ arena:
+  default: true
+  description: "Arena root permission node"
+  children:
+   arena.command:
+    default: true
+    description: "gives access to /arena"
