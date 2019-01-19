@@ -6,6 +6,9 @@ namespace AndreasHGK\Arena\arena;
 
 use AndreasHGK\Arena\Arena;
 use pocketmine\block\SnowLayer;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\level\Position;
 use pocketmine\level\sound\AnvilFallSound;
 use pocketmine\level\sound\EndermanTeleportSound;
@@ -124,9 +127,19 @@ abstract class ArenaClass{
     public function respawn(Player $player) : void{
         $spawn = array_rand($this->spawns);
         $this->spawns[$spawn]->spawnPlayer($player);
+        $player->getArmorInventory()->setHelmet(ItemFactory::get(ItemIds::IRON_HELMET, 0, 1));
+        $player->getArmorInventory()->setChestplate(ItemFactory::get(ItemIds::IRON_CHESTPLATE, 0, 1));
+        $player->getArmorInventory()->setLeggings(ItemFactory::get(ItemIds::IRON_LEGGINGS, 0, 1));
+        $player->getArmorInventory()->setBoots(ItemFactory::get(ItemIds::IRON_BOOTS, 0, 1));
+        $inv = $player->getInventory();
+        $inv->setItem(0, ItemFactory::get(ItemIds::DIAMOND_SWORD, 0, 1));
+        $inv->setItem(1, ItemFactory::get(ItemIds::BOW, 0, 1));
+        $inv->setItem(2, ItemFactory::get(ItemIds::ARROW, 0, 64));
+        $inv->setItem(8, ItemFactory::get(ItemIds::STEAK, 0, 64));
     }
 
     public function onJoin(Player $player) : void{
+        $player->getInventory()->clearAll();
         $this->respawn($player);
         $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
         $player->addSubTitle(TextFormat::colorize("&7Joined arena &c".$this->name));
@@ -134,7 +147,6 @@ abstract class ArenaClass{
         $player->setHealth(20);
         $player->setFood(20);
         $player->removeAllEffects();
-        $player->getInventory()->clearAll();
         $player->setGamemode(0);
     }
 

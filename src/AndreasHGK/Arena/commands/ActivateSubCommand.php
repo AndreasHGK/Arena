@@ -9,6 +9,7 @@ use AndreasHGK\Arena\arena\ArenaManager;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
 class ActivateSubCommand extends SubCommand {
 
@@ -25,12 +26,12 @@ class ActivateSubCommand extends SubCommand {
             if ($this->manager->arenaExists($arena)) {
                 $arena = $this->manager->getArena($arena);
                 $arena->activate();
-                $this->sender->sendMessage("activating");
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Activated arena &c&l".$arena->getName()));
             }else{
-                $this->sender->sendMessage("arena doesn't exist");
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 There is already an arena with that name"));
             }
         }else{
-            $this->sender->sendMessage("missing argument");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
         }
     }
 

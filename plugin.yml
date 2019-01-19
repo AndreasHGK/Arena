@@ -8,9 +8,15 @@ description: A PMMP arena plugin
 
 permissions:
  arena:
-  default: true
+  default: op
   description: "Arena root permission node"
   children:
    arena.command:
     default: true
     description: "gives access to /arena"
+   arena.play:
+    default: true
+    description: "allows playing in arenas"
+   arena.create:
+    default: false
+    description: "allows creation of arenas"

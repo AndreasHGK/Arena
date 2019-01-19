@@ -9,6 +9,7 @@ use AndreasHGK\Arena\arena\ArenaManager;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
 class Pos1SubCommand extends SubCommand {
 
@@ -21,12 +22,12 @@ class Pos1SubCommand extends SubCommand {
 
     public function execute() : void{
         if(!isset($this->args[1])){
-            $this->sender->sendMessage("missing argument");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
         }elseif($this->manager->arenaExists($this->args[1])){
             $this->arena->pos($this->sender->getName(), 1, $this->args[1]);
-            $this->sender->sendMessage("set pos1");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set position 1 for arena &c&l".$this->args[1]));
         }else{
-            $this->sender->sendMessage("arena doesn't exist");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
         }
     }
 

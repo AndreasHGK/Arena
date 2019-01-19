@@ -34,66 +34,102 @@ class ArenaCommand implements CommandExecutor {
             }
             switch(strtolower($args[0])){
                 case "join":
+                    if(!$sender->hasPermission("arena.play")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new JoinSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "leave":
+                    if(!$sender->hasPermission("arena.play")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new LeaveSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "list":
+                    if(!$sender->hasPermission("arena.play")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new ListSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "create":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new CreateSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "delete":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new DeleteSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "addspawn":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new AddspawnSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "delspawn":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new DelspawnSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "pos1":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new Pos1SubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "pos2":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new Pos2SubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "activate":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new ActivateSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
                 case "deactivate":
+                    if(!$sender->hasPermission("arena.create")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
                     $cmd = new DeactivateSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
-                    return true;
-                    break;
-                case "testtip":
-                    $sender->sendMessage("testtip");
-                    $sender->addActionBarMessage(TextFormat::colorize("&7Killed player &4test12"));
-                    $level = $sender->getLevel();
-                    $pos = new Vector3($sender->getX(), $sender->getY(), $sender->getZ());
-                    $level->addSound(new AnvilFallSound($pos));
                     return true;
                     break;
                 default:

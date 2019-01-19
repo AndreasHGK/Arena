@@ -9,6 +9,7 @@ use AndreasHGK\Arena\arena\ArenaManager;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
 class ListSubCommand extends SubCommand {
 
@@ -20,11 +21,11 @@ class ListSubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $str = "arenas: ";
+        $str = "&l&8[&c!&8]&r&7 arenas: &c&l";
         foreach($this->manager->getAll() as $arena){
-            $str = $str.$arena->getName()." ";
+            $str = $str.$arena->getName()."&r&7, &c&l";
         }
-        $this->sender->sendMessage($str);
+        $this->sender->sendMessage(TextFormat::colorize($str));
     }
 
 }

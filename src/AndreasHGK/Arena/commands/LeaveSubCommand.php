@@ -9,6 +9,7 @@ use AndreasHGK\Arena\arena\ArenaManager;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
 class LeaveSubCommand extends SubCommand {
 
@@ -22,9 +23,8 @@ class LeaveSubCommand extends SubCommand {
     public function execute() : void{
         if($this->manager->playerIsInArena($this->sender)){
             $this->manager->playerLeave($this->sender);
-            $this->sender->sendMessage("leave");
         }else{
-            $this->sender->sendMessage("not in arena");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You're not in an arena"));
         }
     }
 

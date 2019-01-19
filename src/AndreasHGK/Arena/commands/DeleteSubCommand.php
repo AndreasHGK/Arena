@@ -9,6 +9,7 @@ use AndreasHGK\Arena\arena\ArenaManager;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
 class DeleteSubCommand extends SubCommand{
 
@@ -23,14 +24,14 @@ class DeleteSubCommand extends SubCommand{
     public function execute(): void
     {
         if (!isset($this->args[1])) {
-            $this->sender->sendMessage("missing argument");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
             return;
         } elseif (NULL !== $this->manager->getArena($this->args[1])) {
             $this->manager->delete($this->args[1]);
-            $this->sender->sendMessage("delete");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deleted arena &c&l".$this->args[1]));
             return;
         } else {
-            $this->sender->sendMessage("arena doesn't exist");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
             return;
         }
 

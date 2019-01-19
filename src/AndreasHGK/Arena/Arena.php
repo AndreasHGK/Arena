@@ -18,6 +18,7 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 
 use AndreasHGK\Arena\commands\ArenaCommand;
+use pocketmine\utils\TextFormat;
 
 class Arena extends PluginBase implements Listener {
 
@@ -117,13 +118,13 @@ class Arena extends PluginBase implements Listener {
                 $this->manager->getArena($this->posa[$player->getName()])->setPos1($pos);
                 unset($this->pos[$player->getName()]);
                 unset($this->posa[$player->getName()]);
-                $player->sendMessage("pos1 set");
+                $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set first position"));
             }elseif($this->pos[$player->getName()] == 2){
                 $pos = new Position($event->getBlock()->getX(), $event->getBlock()->getY(), $event->getBlock()->getZ());
                 $this->manager->getArena($this->posa[$player->getName()])->setPos2($pos);
                 unset($this->pos[$player->getName()]);
                 unset($this->posa[$player->getName()]);
-                $player->sendMessage("pos2 set");
+                $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set second position"));
             }
             $event->setCancelled();
         }
