@@ -1,6 +1,6 @@
 name: Arena
 main: AndreasHGK\Arena\Arena
-version: 0.0.1
+version: 1.0.0-alpha1
 api: 3.5.5
 load: POSTWORLD
 author: AndreasHGK

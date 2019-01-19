@@ -10,7 +10,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
-class Pos2SubCommand extends SubCommand {
+class ActivateSubCommand extends SubCommand {
 
     private $manager;
 
@@ -20,13 +20,17 @@ class Pos2SubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        if(!isset($this->args[1])){
-            $this->sender->sendMessage("missing argument");
-        }elseif($this->manager->arenaExists($this->args[1])){
-            $this->arena->pos($this->sender->getName(), 2, $this->args[1]);
-            $this->sender->sendMessage("set pos2");
+        if(isset($this->args[1])) {
+            $arena = $this->args[1];
+            if ($this->manager->arenaExists($arena)) {
+                $arena = $this->manager->getArena($arena);
+                $arena->activate();
+                $this->sender->sendMessage("activating");
+            }else{
+                $this->sender->sendMessage("arena doesn't exist");
+            }
         }else{
-            $this->sender->sendMessage("arena doesn't exist");
+            $this->sender->sendMessage("missing argument");
         }
     }
 

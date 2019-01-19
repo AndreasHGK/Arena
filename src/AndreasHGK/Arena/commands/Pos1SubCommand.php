@@ -20,8 +20,14 @@ class Pos1SubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $this->sender->sendMessage("pos1");
-        $this->arena->pos($this->sender->getName(), 1, $this->args[1]);
+        if(!isset($this->args[1])){
+            $this->sender->sendMessage("missing argument");
+        }elseif($this->manager->arenaExists($this->args[1])){
+            $this->arena->pos($this->sender->getName(), 1, $this->args[1]);
+            $this->sender->sendMessage("set pos1");
+        }else{
+            $this->sender->sendMessage("arena doesn't exist");
+        }
     }
 
 }

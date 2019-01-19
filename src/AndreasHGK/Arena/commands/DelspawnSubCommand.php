@@ -10,7 +10,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
-class Pos2SubCommand extends SubCommand {
+class DelspawnSubCommand extends SubCommand {
 
     private $manager;
 
@@ -20,13 +20,18 @@ class Pos2SubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        if(!isset($this->args[1])){
-            $this->sender->sendMessage("missing argument");
-        }elseif($this->manager->arenaExists($this->args[1])){
-            $this->arena->pos($this->sender->getName(), 2, $this->args[1]);
-            $this->sender->sendMessage("set pos2");
+        $arena = $this->args[1];
+        $name = $this->args[2];
+        if(isset($arena) && isset($name)){
+            $arena = $this->manager->getArena($arena);
+            if(!$arena->spawnExists($name)){
+                $this->sender->sendMessage("spawn doesn't exist");
+            }else{
+                $arena->delSpawn($name);
+                $this->sender->sendMessage("deleted spawn ".$name);
+            }
         }else{
-            $this->sender->sendMessage("arena doesn't exist");
+            $this->sender->sendMessage("missing argument");
         }
     }
 

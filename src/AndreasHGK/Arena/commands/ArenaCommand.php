@@ -38,6 +38,11 @@ class ArenaCommand implements CommandExecutor {
                     $cmd->execute();
                     return true;
                     break;
+                case "leave":
+                    $cmd = new LeaveSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
                 case "list":
                     $cmd = new ListSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
@@ -53,8 +58,13 @@ class ArenaCommand implements CommandExecutor {
                     $cmd->execute();
                     return true;
                     break;
-                case "leave":
-                    $cmd = new LeaveSubCommand($this->plugin, $sender, $args, $this->manager);
+                case "addspawn":
+                    $cmd = new AddspawnSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
+                case "delspawn":
+                    $cmd = new DelspawnSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
@@ -65,6 +75,16 @@ class ArenaCommand implements CommandExecutor {
                     break;
                 case "pos2":
                     $cmd = new Pos2SubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
+                case "activate":
+                    $cmd = new ActivateSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
+                case "deactivate":
+                    $cmd = new DeactivateSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;

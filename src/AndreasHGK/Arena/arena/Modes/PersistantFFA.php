@@ -24,9 +24,17 @@ class PersistantFFA extends ArenaClass {
     public function onKill(Player $killer, Player $killed) : void
     {
         $killer->addActionBarMessage(TextFormat::colorize("&7Killed player &4".$killed->getName()));
-        $level = $killed->getLevel();
-        $pos = new Vector3($killed->getX(), $killed->getY(), $killed->getZ());
+    }
+
+    public function onDeath(Player $player) : void{
+        $level = $player->getLevel();
+        $pos = new Vector3($player->getX(), $player->getY(), $player->getZ());
         $level->addSound(new AnvilFallSound($pos));
+        $player->setHealth(20);
+        $player->setFood(20);
+        $player->removeAllEffects();
+        $player->getInventory()->clearAll();
+        $this->respawn($player);
     }
 
 }

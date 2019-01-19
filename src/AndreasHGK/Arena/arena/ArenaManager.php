@@ -75,8 +75,12 @@ class ArenaManager{
     }
 
     public function playerJoin($player, string $arena) : void{
+        $arena = $this->getArena($arena);
+        if($arena->isActive() == false){
+            $player->sendMessage("failed: arena not activated");
+            return;
+        }
         if(!$this->playerIsInArena($player)){
-            $arena = $this->getArena($arena);
             if(isset($arena)){
                 $arena->addPlayer($player);
             }
