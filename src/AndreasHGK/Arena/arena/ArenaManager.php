@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AndreasHGK\Arena\arena;
 
 use AndreasHGK\Arena\Arena;
