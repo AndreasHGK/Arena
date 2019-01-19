@@ -9,7 +9,6 @@ use AndreasHGK\Arena\arena\ArenaManager;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
-use Sheep\Command\Command;
 
 class ListSubCommand extends SubCommand {
 

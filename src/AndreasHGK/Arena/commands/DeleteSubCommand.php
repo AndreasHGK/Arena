@@ -10,7 +10,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
-class CreateSubCommand extends SubCommand{
+class DeleteSubCommand extends SubCommand{
 
     protected $manager;
 
@@ -25,10 +25,14 @@ class CreateSubCommand extends SubCommand{
         if (!isset($this->args[1])) {
             $this->sender->sendMessage("missing argument");
             return;
-        }if(!isset($this->args[2])){
-            $this->args[2] = "persistantffa";
+        } elseif (NULL !== $this->manager->getArena($this->args[1])) {
+            $this->manager->delete($this->args[1]);
+            $this->sender->sendMessage("delete");
+            return;
+        } else {
+            $this->sender->sendMessage("arena doesn't exist");
+            return;
         }
-        $this->manager->create((string)$this->args[1], $this->arena->getServer()->getPlayerByUUID($this->sender->getUniqueId()), (string)$this->args[2]);
-        $this->sender->sendMessage("created arena ".(string)$this->args[1]." with mode ".(string)$this->args[2]);
+
     }
 }

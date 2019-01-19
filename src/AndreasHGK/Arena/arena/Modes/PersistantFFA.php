@@ -11,17 +11,17 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Elimination extends ArenaClass {
+class PersistantFFA extends ArenaClass {
 
     protected $type;
 
     public function __construct(Arena $plugin, string $name, Player $creator){
         parent::__construct($plugin, $name, $creator);
-        $this->type = "elimination";
-        $this->ffa = false;
+        $this->type = "PersistantFFA";
+        $this->ffa = true;
     }
 
-    public function onKill(Player $killer, Player $killed): void
+    public function onKill(Player $killer, Player $killed) : void
     {
         $killer->addActionBarMessage(TextFormat::colorize("&7Killed player &4".$killed->getName()));
         $level = $killed->getLevel();

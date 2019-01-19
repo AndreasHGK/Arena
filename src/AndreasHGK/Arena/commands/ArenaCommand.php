@@ -34,7 +34,7 @@ class ArenaCommand implements CommandExecutor {
             }
             switch(strtolower($args[0])){
                 case "join":
-                    $cmd = new JoinSubCommand($this->plugin, $sender, $args);
+                    $cmd = new JoinSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;
@@ -48,8 +48,23 @@ class ArenaCommand implements CommandExecutor {
                     $cmd->execute();
                     return true;
                     break;
+                case "delete":
+                    $cmd = new DeleteSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
                 case "leave":
-                    $cmd = new LeaveSubCommand($this->plugin, $sender, $args);
+                    $cmd = new LeaveSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
+                case "pos1":
+                    $cmd = new Pos1SubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
+                case "pos2":
+                    $cmd = new Pos2SubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
                     break;

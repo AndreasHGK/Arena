@@ -10,7 +10,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
-class LeaveSubCommand extends SubCommand {
+class Pos1SubCommand extends SubCommand {
 
     private $manager;
 
@@ -20,12 +20,8 @@ class LeaveSubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        if($this->manager->playerIsInArena($this->sender)){
-            $this->manager->playerLeave($this->sender);
-            $this->sender->sendMessage("leave");
-        }else{
-            $this->sender->sendMessage("not in arena");
-        }
+        $this->sender->sendMessage("pos1");
+        $this->arena->pos($this->sender->getName(), 1, $this->args[1]);
     }
 
 }
