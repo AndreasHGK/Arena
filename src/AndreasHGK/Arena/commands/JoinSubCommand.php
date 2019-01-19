@@ -8,19 +8,16 @@ use AndreasHGK\Arena\Arena;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use Sheep\Command\Command;
 
-abstract class SubCommand{
-
-    protected $arena;
-    protected $sender;
-    protected $args = [];
+class JoinSubCommand extends SubCommand {
 
     public function __construct(Arena $arena, CommandSender $sender, array $args){
-        $this->arena = $arena;
-        $this->sender = $sender;
-        $this->args = $args;
+        parent::__construct($arena, $sender, $args);
     }
 
-    public abstract function execute();
+    public function execute() : void{
+        $this->sender->sendMessage("join");
+    }
 
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AndreasHGK\Arena\commands;
 
+use AndreasHGK\Arena\arena\ArenaManager;
 use pocketmine\command\Command;
 use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
@@ -17,28 +18,38 @@ use pocketmine\utils\TextFormat;
 class ArenaCommand implements CommandExecutor {
 
     private $plugin;
+    private $manager;
 
-    public function __construct(Arena $plugin){
+    public function __construct(Arena $plugin, ArenaManager $manager){
         $this->plugin = $plugin;
+        $this->manager = $manager;
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
         if(strtolower($command->getName()) == "arena"){
             if(!isset($args[0])){
-                $sender->sendMessage("help");
+                $cmd = new HelpSubCommand($this->plugin, $sender, $args);
+                $cmd->execute();
                 return true;
             }
             switch(strtolower($args[0])){
                 case "join":
-                    $sender->sendMessage("join");
+                    $cmd = new JoinSubCommand($this->plugin, $sender, $args);
+                    $cmd->execute();
                     return true;
                     break;
                 case "list":
-                    $sender->sendMessage("list");
+                    $cmd = new ListSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
                     return true;
                     break;
                 case "create":
-                    $cmd = new CreateSubCommand($this->plugin, $sender);
+                    $cmd = new CreateSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
+                case "leave":
+                    $cmd = new LeaveSubCommand($this->plugin, $sender, $args);
                     $cmd->execute();
                     return true;
                     break;
@@ -51,7 +62,8 @@ class ArenaCommand implements CommandExecutor {
                     return true;
                     break;
                 default:
-                    $sender->sendMessage("help");
+                    $cmd = new HelpSubCommand($this->plugin, $sender, $args);
+                    $cmd->execute();
                     return true;
                     break;
             }
