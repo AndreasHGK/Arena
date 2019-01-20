@@ -29,7 +29,7 @@ class CreateSubCommand extends SubCommand{
         }if(!isset($this->args[2])){
             $this->args[2] = "FFA";
         }
-        $this->manager->create((string)$this->args[1], $this->arena->getServer()->getPlayerByUUID($this->sender->getUniqueId()), (string)$this->args[2]);
+        $this->manager->create((string)$this->args[1], $this->sender->getName(), (string)$this->args[2]);
         $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 created a &c&l".$this->args[2]."&r&7 arena named &c&l".$this->args[1]));
     }
 }

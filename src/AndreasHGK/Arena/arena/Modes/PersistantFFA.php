@@ -15,7 +15,7 @@ class PersistantFFA extends ArenaClass {
 
     protected $type;
 
-    public function __construct(Arena $plugin, string $name, Player $creator){
+    public function __construct(Arena $plugin, string $name, string $creator){
         parent::__construct($plugin, $name, $creator);
         $this->type = "PersistantFFA";
         $this->ffa = true;

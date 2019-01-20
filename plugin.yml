@@ -1,6 +1,6 @@
 name: Arena
 main: AndreasHGK\Arena\Arena
-version: 1.0.0-alpha1
+version: 1.0.0-beta
 api: 3.5.5
 load: POSTWORLD
 author: AndreasHGK
@@ -20,3 +20,6 @@ permissions:
    arena.create:
     default: false
     description: "allows creation of arenas"
+   arena.save:
+    default: op
+    description: "saves all arenas"

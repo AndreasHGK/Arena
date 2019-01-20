@@ -20,11 +20,8 @@ class ArenaManager{
         $this->plugin = $plugin;
     }
 
-    public function create(string $name, Player $creator, string $type) : void{
+    public function create(string $name, string $creator, string $type) : void{
         switch(strtolower($type)){
-            case "elimination":
-                $arena = new Elimination($this->plugin, $name, $creator);
-                break;
             case "freeforall":
             case "ffa":
                 $arena = new PersistantFFA($this->plugin, $name, $creator);
@@ -77,7 +74,7 @@ class ArenaManager{
     public function playerJoin($player, string $arena) : void{
         $arena = $this->getArena($arena);
         if($arena->isActive() == false){
-            $player->sendMessage("failed: arena not activated");
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena is not activated"));
             return;
         }
         if(!$this->playerIsInArena($player)){

@@ -31,7 +31,7 @@ abstract class ArenaClass{
     protected $ffa;
     protected $spawns = [];
 
-    public function __construct(Arena $arena, string $name, Player $creator){
+    public function __construct(Arena $arena, string $name, string $creator){
         $this->active = false;
         $this->arena = $arena;
         $this->name = $name;
@@ -86,7 +86,7 @@ abstract class ArenaClass{
         return $this->type;
     }
 
-    public function getCreator() : Player{
+    public function getCreator() : string{
         return $this->creator;
     }
 
@@ -174,7 +174,7 @@ abstract class ArenaClass{
     }
 
     public function isInArena(Position $pos) : bool{
-        if($pos->getX() > min($this->pos1->getX(), $this->pos2->getX()) && $pos->getX() < max($this->pos1->getX(), $this->pos2->getX()) && $pos->getY() > min($this->pos1->getY(), $this->pos2->getY()) && $pos->getY() < max($this->pos1->getY(), $this->pos2->getY()) && $pos->getZ() > min($this->pos1->getZ(), $this->pos2->getZ()) && $pos->getZ() < max($this->pos1->getZ(), $this->pos2->getZ())){
+        if($pos->getX() >= min($this->pos1->getX(), $this->pos2->getX()) && $pos->getX() <= max($this->pos1->getX(), $this->pos2->getX()) && $pos->getY() >= min($this->pos1->getY(), $this->pos2->getY()) && $pos->getY() <= max($this->pos1->getY(), $this->pos2->getY()) && $pos->getZ() >= min($this->pos1->getZ(), $this->pos2->getZ()) && $pos->getZ() <= max($this->pos1->getZ(), $this->pos2->getZ())){
             return true;
         }
         return false;
