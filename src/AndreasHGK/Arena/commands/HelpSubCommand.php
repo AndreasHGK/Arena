@@ -18,10 +18,7 @@ class HelpSubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $string = "&7-&l&4Arena &7help&r&7- 
-        \n &r&c/arena list &7- lists arenas
-        \n &r&c/arena join {arena} &7- join an arena
-        \n &r&c/arena leave &7- leave an arena";
+        $string = "&7-&l&4Arena &7help&r&7-\n\n &r&c/arena list &7- lists arenas\n\n &r&c/arena join {arena} &7- join an arena\n\n &r&c/arena leave &7- leave an arena";
         if($this->sender->hasPermission("arena.create")){
             $string = $string."
         \n &r&c/arena create {arena} [mode] &7- create an arena
