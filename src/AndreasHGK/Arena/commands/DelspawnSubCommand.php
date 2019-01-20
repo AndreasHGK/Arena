@@ -21,15 +21,17 @@ class DelspawnSubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $arena = $this->args[1];
-        $name = $this->args[2];
-        if(isset($arena) && isset($name)){
-            $arena = $this->manager->getArena($arena);
-            if(!$arena->spawnExists($name)){
-                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That spawn does not exist"));
-            }else{
+        if(isset($this->args[1]) && isset($this->args[2])){
+            $arena = $this->args[1];
+            $name = $this->args[2];
+            if(!$this->manager->arenaExists($arena)){
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
+            }elseif($this->manager->getArena($arena)->spawnExists($name)){
+                $arena = $this->manager->getArena($arena);
                 $arena->delSpawn($name);
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deleted spawn &c&l".$name."&r&7 from arena &c&l".$arena->getName()));
+            }else{
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That spawn doesn't exist"));
             }
         }else{
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));

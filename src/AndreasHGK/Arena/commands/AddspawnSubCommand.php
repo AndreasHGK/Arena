@@ -25,12 +25,14 @@ class AddspawnSubCommand extends SubCommand {
         if(isset($this->args[1]) && isset($this->args[2])){
             $arena = $this->args[1];
             $name = $this->args[2];
-            $arena = $this->manager->getArena($arena);
-            if($arena->spawnExists($name)){
-                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That spawn already exists"));
-            }else{
+            if(!$this->manager->arenaExists($arena)){
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
+            }elseif(!$this->manager->getArena($arena)->spawnExists($name)){
+                $arena = $this->manager->getArena($arena);
                 $arena->addSpawn($name, $this->sender->getPosition());
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Added spawn &c&l".$name."&r&7 in arena &c&l".$arena->getName()));
+            }else{
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That spawn already exists"));
             }
         }else{
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));

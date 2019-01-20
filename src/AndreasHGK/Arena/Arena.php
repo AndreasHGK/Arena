@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena;
 
 use AndreasHGK\Arena\arena\ArenaManager;
+use Ds\Vector;
+use pocketmine\math\Vector3;
+use pocketmine\utils\Config;
 use pocketmine\command\PluginCommand;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -27,10 +30,32 @@ class Arena extends PluginBase implements Listener {
     private $pos = [];
     private $posa = [];
 
+    private $cfg;
+    private $save;
+
+    private $format = [
+        "name" => "default",
+        "active" => false,
+        "creator" => "player",
+        "pos1x" => NULL,
+        "pos1y" => NULL,
+        "pos1z" => NULL,
+        "pos2x" => NULL,
+        "pos2y" => NULL,
+        "pos2z" => NULL,
+        "spawns" => [],
+        "type" => "PersistantFFA"
+    ];
+
 	public function onEnable() : void{
-//        @mkdir($this->getDataFolder());
-//        $this->saveDefaultConfig();
-//        $this->cfg = $this->getConfig()->getAll();
+        $this->save = new Config($this->getDataFolder()."arenas.json",Config::JSON,[
+            "arenas" => []
+        ]);
+        $this->saveResource("arenas.json", false);
+
+        @mkdir($this->getDataFolder());
+        $this->saveDefaultConfig();
+        $this->cfg = $this->getConfig()->getAll();
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
 
 	    $this->manager = new ArenaManager($this);
@@ -39,6 +64,8 @@ class Arena extends PluginBase implements Listener {
 	    $cmd->setDescription("join or create arenas");
 	    $cmd->setPermission("arena.command");
 	    $this->getServer()->getCommandMap()->register("arena", $cmd, "arena");
+
+	    $this->load();
 	}
 
 	public function getArenaManager() : ArenaManager{
@@ -137,6 +164,70 @@ class Arena extends PluginBase implements Listener {
         }
     }
 
+    public function save(){
+        $this->getLogger()->debug("saving arenas...");
+	    if(isset($this->manager->getAll())){
+            foreach($this->manager->getAll() as $arena){
+                $arenacfg = $this->format;
+                $arenacfg["name"] = $arena->getName();
+                $arenacfg["active"] = $arena->isActive();
+                $arenacfg["creator"] = $arena->getCreator()->getName();
+                if($arena->pos1Isset()){
+                    $arenacfg["pos1x"] = $arena->getPos1()->getX();
+                    $arenacfg["pos1y"] = $arena->getPos1()->getY();
+                    $arenacfg["pos1z"] = $arena->getPos1()->getZ();
+                }
+                if($arena->pos2Isset()){
+                    $arenacfg["pos2x"] = $arena->getPos2()->getX();
+                    $arenacfg["pos2y"] = $arena->getPos2()->getY();
+                    $arenacfg["pos2z"] = $arena->getPos2()->getZ();
+                }
+                $spawns = $arena->getSpawns();
+                if(isset($spawns)){
+                    foreach($spawns as $spawn){
+                        $arenacfg["spawns"][$spawn->getName()]["name"] = $spawn->getName();
+                        $arenacfg["spawns"][$spawn->getName()]["x"] = $spawn->getPos()->getX();
+                        $arenacfg["spawns"][$spawn->getName()]["y"] = $spawn->getPos()->getY();
+                        $arenacfg["spawns"][$spawn->getName()]["y"] = $spawn->getPos()->getZ();
+                    }
+                }
+                $arenacfg["type"] = $arena->getType();
+                $this->save["arenas"][$arena->getName()] = $arenacfg;
+                $this->getLogger()->debug("saved arena ".$arena->getName());
+            }
+        }else{
+            $this->getLogger()->debug("there are no arenas to save!");
+        }
+    }
+
+    public function load(){
+        $this->getLogger()->debug("loading arenas...");
+        if(isset($this->save["arenas"])){
+            foreach($this->save["arenas"] as $arena){
+                $this->manager->create($arena["name"], $this->getServer()->getPlayer($arena["creator"]), $arena["type"]);
+                $arenaobj = $this->manager->getArena($arena["name"]);
+                if(isset($arena["pos1x"])){
+                    $arenaobj->setPos1(new Position($arena["pos1x"], $arena["pos1y"], $arena["pos1z"]));
+                }
+                if(isset($arena["pos2x"])){
+                    $arenaobj->setPos2(new Position($arena["pos2x"], $arena["pos2y"], $arena["pos2z"]));
+                }
+                if(isset($arena["spawns"])){
+                    foreach($arena["spawns"] as $spawn){
+                        $arenaobj->addSpawn($spawn["name"], new Position($spawn["x"], $spawn["y"], $spawn["z"]));
+                    }
+                }
+                if($arena["active"] == true){
+                    $arenaobj->setActive();
+                }
+                $this->getLogger()->debug("loaded arena ".$arenaobj->getName());
+            }
+        }else{
+            $this->getLogger()->debug("there are no arenas to load!");
+        }
+    }
+
 	public function onDisable() : void{
+	    $this->save();
 	}
 }

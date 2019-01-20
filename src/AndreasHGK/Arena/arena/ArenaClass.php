@@ -56,6 +56,14 @@ abstract class ArenaClass{
         return $this->pos2;
     }
 
+    public function pos1Isset() : bool{
+        return isset($this->pos1);
+    }
+
+    public function pos2Isset() : bool{
+        return isset($this->pos2);
+    }
+
     public function activate() : void{
        if(isset($this->pos1) && isset($this->pos2) && !empty($this->spawns)){
            $this->active = true;
@@ -76,6 +84,10 @@ abstract class ArenaClass{
 
     public function getType(): string{
         return $this->type;
+    }
+
+    public function getCreator() : Player{
+        return $this->creator;
     }
 
     public function getPlayers() : array{
@@ -107,7 +119,7 @@ abstract class ArenaClass{
     }
 
     public function addSpawn(string $name, Position $pos) : void{
-        $this->spawns[$name] = new ArenaSpawn($this, $pos);
+        $this->spawns[$name] = new ArenaSpawn($this, $pos, $name);
     }
 
     public function delSpawn(string $name) : void{
