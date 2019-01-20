@@ -31,6 +31,7 @@ class Arena extends PluginBase implements Listener {
     private $posa = [];
 
     private $cfg;
+    private $arenas;
     private $save;
 
     private $format = [
@@ -48,11 +49,11 @@ class Arena extends PluginBase implements Listener {
     ];
 
 	public function onEnable() : void{
-        $this->save = new Config($this->getDataFolder()."arenas.json",Config::JSON,[
+        $this->arenas = new Config($this->getDataFolder()."arenas.json",Config::JSON,[
             "arenas" => []
         ]);
-        $this->saveResource("arenas.json", false);
-
+        $this->arenas->save();
+        $this->save = $this->arenas->getAll();
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
         $this->cfg = $this->getConfig()->getAll();
@@ -166,7 +167,7 @@ class Arena extends PluginBase implements Listener {
 
     public function save(){
         $this->getLogger()->debug("saving arenas...");
-	    if(isset($this->manager->getAll())){
+	    if(!empty($this->manager->getAll())){
             foreach($this->manager->getAll() as $arena){
                 $arenacfg = $this->format;
                 $arenacfg["name"] = $arena->getName();
@@ -183,7 +184,7 @@ class Arena extends PluginBase implements Listener {
                     $arenacfg["pos2z"] = $arena->getPos2()->getZ();
                 }
                 $spawns = $arena->getSpawns();
-                if(isset($spawns)){
+                if(!empty($spawns)){
                     foreach($spawns as $spawn){
                         $arenacfg["spawns"][$spawn->getName()]["name"] = $spawn->getName();
                         $arenacfg["spawns"][$spawn->getName()]["x"] = $spawn->getPos()->getX();
@@ -198,21 +199,22 @@ class Arena extends PluginBase implements Listener {
         }else{
             $this->getLogger()->debug("there are no arenas to save!");
         }
+        $this->arenas->save();
     }
 
     public function load(){
         $this->getLogger()->debug("loading arenas...");
-        if(isset($this->save["arenas"])){
+        if(!empty($this->save["arenas"])){
             foreach($this->save["arenas"] as $arena){
                 $this->manager->create($arena["name"], $this->getServer()->getPlayer($arena["creator"]), $arena["type"]);
                 $arenaobj = $this->manager->getArena($arena["name"]);
-                if(isset($arena["pos1x"])){
+                if($arena["pos1x"] !== NULL){
                     $arenaobj->setPos1(new Position($arena["pos1x"], $arena["pos1y"], $arena["pos1z"]));
                 }
-                if(isset($arena["pos2x"])){
+                if($arena["pos2x"] !== NULL){
                     $arenaobj->setPos2(new Position($arena["pos2x"], $arena["pos2y"], $arena["pos2z"]));
                 }
-                if(isset($arena["spawns"])){
+                if(!empty($arena["spawns"])){
                     foreach($arena["spawns"] as $spawn){
                         $arenaobj->addSpawn($spawn["name"], new Position($spawn["x"], $spawn["y"], $spawn["z"]));
                     }
