@@ -40,6 +40,10 @@ abstract class ArenaClass{
         $this->ffa = true;
     }
 
+    public function getPlugin() : Arena{
+        return $this->arena;
+    }
+
     public function setPos1(Position $pos1) : void{
         $this->pos1 = $pos1;
     }
@@ -155,7 +159,6 @@ abstract class ArenaClass{
         $this->respawn($player);
         $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
         $player->addSubTitle(TextFormat::colorize("&7Joined arena &c".$this->name));
-        $player->getLevel()->addSound(new EndermanTeleportSound($player), $player->getViewers());
         $player->setHealth(20);
         $player->setFood(20);
         $player->removeAllEffects();

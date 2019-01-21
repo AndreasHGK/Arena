@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena;
 
 use AndreasHGK\Arena\arena\ArenaManager;
+use AndreasHGK\Arena\module\HealthTagModule;
 use Ds\Vector;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
@@ -33,10 +34,12 @@ class Arena extends PluginBase implements Listener {
     private $pos = [];
     private $posa = [];
 
-    private $cfg;
+    public $cfg;
     /** @var Config */
     public $arenas;
     private $save;
+
+    private $hpmodule;
 
     private $format = [
         "name" => "default",
@@ -60,6 +63,10 @@ class Arena extends PluginBase implements Listener {
 	    $cmd->setDescription("join or create arenas");
 	    $cmd->setPermission("arena.command");
 	    $this->getServer()->getCommandMap()->register("arena", $cmd, "arena");
+	    if($this->cfg["healthtags"]){
+	        $this->hpmodule = new HealthTagModule($this, $this->manager);
+	        $this->hpmodule->execute();
+        }
 	}
 
 	public function onLoad(){

@@ -23,3 +23,6 @@ blockcommands:
   - "/spawn"
   - "/warp"
   - "/hub"
+
+claims: true
+healthtags: true

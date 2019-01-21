@@ -106,6 +106,10 @@ class ArenaCommand implements CommandExecutor {
                             }
                         }
                     }
+                    if($sender->getLevel()->getName() != $this->plugin->cfg["world"]){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this in this world"));
+                        return true;
+                    }
                     $cmd = new AddspawnSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
@@ -144,6 +148,10 @@ class ArenaCommand implements CommandExecutor {
                             }
                         }
                     }
+                    if($sender->getLevel()->getName() != $this->plugin->cfg["world"]){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this in this world"));
+                        return true;
+                    }
                     $cmd = new Pos1SubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
@@ -162,6 +170,10 @@ class ArenaCommand implements CommandExecutor {
                                 return true;
                             }
                         }
+                    }
+                    if($sender->getLevel()->getName() != $this->plugin->cfg["world"]){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this in this world"));
+                        return true;
                     }
                     $cmd = new Pos2SubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();

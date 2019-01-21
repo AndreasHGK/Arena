@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena\arena;
 
 use AndreasHGK\Arena\Arena;
-use AndreasHGK\Arena\arena\modes\Elimination;
 use AndreasHGK\Arena\arena\modes\PersistantFFA;
 use pocketmine\level\Level;
 use pocketmine\network\mcpe\protocol\LabTablePacket;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
 class ArenaManager{
 
@@ -74,11 +74,12 @@ class ArenaManager{
     public function playerJoin($player, string $arena) : void{
         $arena = $this->getArena($arena);
         if($arena->isActive() == false){
-            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena is not activated"));
+            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena is not activated"));
             return;
         }
         if(!$this->playerIsInArena($player)){
             if(isset($arena)){
+                $player->teleport($this->plugin->getServer()->getLevelByName($this->plugin->cfg["world"])->getSafeSpawn());
                 $arena->addPlayer($player);
             }
         }
