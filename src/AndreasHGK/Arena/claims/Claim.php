@@ -6,6 +6,7 @@ namespace AndreasHGK\Arena\claims;
 
 use AndreasHGK\Arena\Arena;
 use AndreasHGK\Arena\module\ClaimsModule;
+use pocketmine\block\BlockIds;
 use pocketmine\level\Position;
 
 class Claim {
@@ -35,7 +36,7 @@ class Claim {
         return $this->pos1;
     }
 
-    public function gePos2() : Position{
+    public function getPos2() : Position{
         return $this->pos2;
     }
 
@@ -48,7 +49,7 @@ class Claim {
     }
 
     public function trust(string $player) : void{
-        $this->trust[$player] = true;
+        $this->trusted[$player] = true;
     }
 
     public function unTrust(string $player) : void{
@@ -72,10 +73,42 @@ class Claim {
     }
 
     public function inClaim(Position $pos, string $level) : bool{
-        if($level == $this->level && $pos->getX() >= min($this->pos1->getX(), $this->pos2->getX()) && $pos->getX() <= max($this->pos1->getX(), $this->pos2->getX()) && $pos->getY() >= min($this->pos1->getY(), $this->pos2->getY()) && $pos->getY() <= max($this->pos1->getY(), $this->pos2->getY()) && $pos->getZ() >= min($this->pos1->getZ(), $this->pos2->getZ()) && $pos->getZ() <= max($this->pos1->getZ(), $this->pos2->getZ())){
+        if($level == $this->level && $pos->getX() >= min($this->pos1->getX(), $this->pos2->getX()) && $pos->getX() <= max($this->pos1->getX(), $this->pos2->getX()) && $pos->getZ() >= min($this->pos1->getZ(), $this->pos2->getZ()) && $pos->getZ() <= max($this->pos1->getZ(), $this->pos2->getZ())){
             return true;
         }
         return false;
+    }
+
+    public function displayCorners() : void{
+        $corners = $this->getCorners();
+        foreach($corners as $corner){
+            $this->module->sendBlocks(BlockIds::GLOWSTONE, $corner);
+            $ca = [
+                new Position($corner->getX()+1, $corner->getLevel()->getHighestBlockAt($corner->getX()+1, $corner->getZ()), $corner->getZ(), $corner->getLevel()),
+                new Position($corner->getX()-1, $corner->getLevel()->getHighestBlockAt($corner->getX()-1, $corner->getZ()), $corner->getZ(), $corner->getLevel()),
+                new Position($corner->getX(), $corner->getLevel()->getHighestBlockAt($corner->getX(), $corner->getZ()+1), $corner->getZ()+1, $corner->getLevel()),
+                new Position($corner->getX(), $corner->getLevel()->getHighestBlockAt($corner->getX(), $corner->getZ()-1), $corner->getZ()-1, $corner->getLevel())
+            ];
+            foreach($ca as $c){
+                if($this->inClaim($c, $c->getLevel()->getName())){
+                    $this->module->sendBlocks(BlockIds::GOLD_BLOCK, $c);
+                }else{
+                    $this->module->sendBlocks($c->getLevel()->getBlockIdAt($c->getX(), $c->getY(), $c->getZ()), $c);
+                }
+            }
+        }
+    }
+
+    public function getDimensions() : array{
+        $dim = [];
+        $dim[0] = abs($this->pos1->getX()-$this->pos2->getX());
+        $dim[1] = abs($this->pos1->getZ()-$this->pos2->getZ());
+        return $dim;
+    }
+
+    public function getSize() : int{
+        $dim = $this->getDimensions();
+        return $dim[0]*$dim[1];
     }
 
     public function getCorners() : array {
@@ -85,5 +118,16 @@ class Claim {
         $array[3] = new Position($this->pos2->getX(), $this->pos2->getLevel()->getHighestBlockAt($this->pos2->getX(), $this->pos2->getZ()), $this->pos2->getZ(), $this->pos2->getLevel());
         $array[4] = new Position($this->pos2->getX(), $this->pos2->getLevel()->getHighestBlockAt($this->pos2->getX(), $this->pos1->getZ()), $this->pos1->getZ(), $this->pos2->getLevel());
         return $array;
+    }
+
+    public function getAllPositions() : array{
+        $positions = [];
+        for($x = min($this->getPos1()->getX(), $this->getPos2()->getX()); $x <= max($this->getPos1()->getX(), $this->getPos2()->getX()); $x++){
+            for($z = min($this->getPos1()->getZ(), $this->getPos2()->getZ()); $z <= max($this->getPos1()->getZ(), $this->getPos2()->getZ()); $z++){
+                $pos = new Position($x, 256, $z, $this->module->arena->getServer()->getLevelByName($this->getLevel()));
+                array_push($positions, $pos);
+            }
+        }
+        return $positions;
     }
 }

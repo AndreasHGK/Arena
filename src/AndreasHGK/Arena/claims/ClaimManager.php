@@ -9,6 +9,7 @@ use AndreasHGK\Arena\module\ClaimsModule;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\utils\Random;
+use AndreasHGK\Arena\claims\Claim;
 
 class ClaimManager
 {
@@ -36,7 +37,7 @@ class ClaimManager
     {
         $id = -1;
         for ($i = 0; $i < 999; $i++) {
-            if (isset($this->claims[$owner][$i])) {
+            if (!isset($this->claims[$owner][$i])) {
                 $id = $i;
                 break;
             } else {
@@ -52,50 +53,56 @@ class ClaimManager
 
     public function isClaimed(Position $pos, string $level): bool
     {
-        foreach ($this->claims as $owner) {
-            foreach ($owner as $claim) {
+        foreach ($this->claims as $key) {
+            foreach($key as $claim){
                 if ($claim->inClaim($pos, $level)) {
                     return true;
                 }
             }
+
         }
         return false;
     }
 
     public function ownsPos(Position $pos, string $level, Player $player): bool
     {
-        foreach ($this->claims as $owner) {
-            foreach ($owner as $claim) {
+        foreach ($this->claims as $key) {
+            foreach($key as $claim){
                 if ($claim->inClaim($pos, $level)) {
                     if ($claim->getOwner() == $player->getName()) {
                         return true;
                     }
                 }
             }
+
         }
         return false;
     }
 
     public function canEdit(Position $pos, string $level, Player $player): bool
     {
-        foreach ($this->claims as $owner) {
-            foreach ($owner as $claim) {
+        foreach ($this->claims as $key) {
+            foreach($key as $claim){
                 if ($claim->inClaim($pos, $level)) {
                     if ($claim->getOwner() == $player->getName() || $claim->isTrusted($player->getName())) {
                         return true;
                     }
                 }
             }
+
         }
         return false;
     }
 
     public function getClaim(Position $pos, string $level): Claim
     {
-        foreach ($this->claims as $key=>$claim) {
-            if ($claim->inClaim($pos, $level)) {
-                return $claim;
+        foreach ($this->claims as $key) {
+            foreach($key as $claim){
+                if ($claim->inClaim($pos, $level)) {
+                    return $claim;
+                }
             }
+
         }
         return NULL;
     }

@@ -28,4 +28,7 @@ permissions:
     description: "gives permission to do /claim"
    claim.use:
     default: false
-    description: "allows claiming land"
+    description: "allows the (un)claiming of land"
+   claim.trust:
+    default: false
+    description: "allows trusting/untrusting players"

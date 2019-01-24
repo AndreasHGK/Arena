@@ -31,6 +31,8 @@ abstract class ArenaClass{
     protected $ffa;
     protected $spawns = [];
 
+    protected $edit;
+
     public function __construct(Arena $arena, string $name, string $creator){
         $this->active = false;
         $this->arena = $arena;
@@ -38,6 +40,11 @@ abstract class ArenaClass{
         $this->creator = $creator;
         $this->type = "default";
         $this->ffa = true;
+        $this->edit = false;
+    }
+
+    public function isEditable() : bool{
+        return $this->edit;
     }
 
     public function getPlugin() : Arena{

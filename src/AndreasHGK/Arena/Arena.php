@@ -41,7 +41,9 @@ class Arena extends PluginBase implements Listener {
     public $arenas;
     private $save;
 
+    /** @var HealthTagModule */
     private $hpmodule;
+    /** @var ClaimsModule*/
     private $cmodule;
 
     private $format = [
@@ -176,29 +178,38 @@ class Arena extends PluginBase implements Listener {
 
     public function onBreak(BlockBreakEvent $event){
 	    $player = $event->getPlayer();
-        foreach($this->manager->getAll() as $arena){
-            if($arena->isActive()){
-                if($arena->isInArena($event->getBlock())){
-                    $event->setCancelled();
-                    return;
+	    $block = $event->getBlock();
+	    if(!$this->cmodule->claimManager->canEdit($block, $block->getLevel()->getName(), $player)){
+            foreach($this->manager->getAll() as $arena){
+                if($arena->isActive()){
+                    if($arena->isInArena($event->getBlock()) && !$arena->hasPlayer($player)){
+                        $event->setCancelled();
+                        return;
+                    }elseif(!$arena->isEditable()){
+                        $event->setCancelled();
+                        return;
+                    }
                 }
             }
-        }
-	    if(isset($this->pos[$player->getName()])){
-            if($this->pos[$player->getName()] == 1){
-                $pos = new Position($event->getBlock()->getX(), $event->getBlock()->getY(), $event->getBlock()->getZ());
-                $this->manager->getArena($this->posa[$player->getName()])->setPos1($pos);
-                unset($this->pos[$player->getName()]);
-                unset($this->posa[$player->getName()]);
-                $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set first position"));
-            }elseif($this->pos[$player->getName()] == 2){
-                $pos = new Position($event->getBlock()->getX(), $event->getBlock()->getY(), $event->getBlock()->getZ());
-                $this->manager->getArena($this->posa[$player->getName()])->setPos2($pos);
-                unset($this->pos[$player->getName()]);
-                unset($this->posa[$player->getName()]);
-                $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set second position"));
+        }elseif($this->cmodule->claimManager->isClaimed($block, $block->getLevel()->getName())){
+            if(isset($this->pos[$player->getName()])){
+                if($this->pos[$player->getName()] == 1){
+                    $pos = new Position($event->getBlock()->getX(), $event->getBlock()->getY(), $event->getBlock()->getZ());
+                    $this->manager->getArena($this->posa[$player->getName()])->setPos1($pos);
+                    unset($this->pos[$player->getName()]);
+                    unset($this->posa[$player->getName()]);
+                    $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set first position"));
+                }elseif($this->pos[$player->getName()] == 2){
+                    $pos = new Position($event->getBlock()->getX(), $event->getBlock()->getY(), $event->getBlock()->getZ());
+                    $this->manager->getArena($this->posa[$player->getName()])->setPos2($pos);
+                    unset($this->pos[$player->getName()]);
+                    unset($this->posa[$player->getName()]);
+                    $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set second position"));
+                }
+                $event->setCancelled();
             }
-            $event->setCancelled();
+        }elseif(isset($this->pos[$player->getName()])){
+            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can only create arenas in a claimed land that you own"));
         }
     }
 

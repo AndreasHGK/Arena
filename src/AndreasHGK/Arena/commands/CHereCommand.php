@@ -24,7 +24,23 @@ class CHereCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $this->sender->sendMessage("C Here");
+        $cm = $this->module->claimManager;
+        if($cm->isClaimed($this->sender->getPosition(), $this->sender->getLevel()->getName())){
+            $claim = $cm->getClaim($this->sender->getPosition(), $this->sender->getLevel()->getName());
+            $owner = $claim->getOwner();
+            $edit = $cm->canEdit($this->sender->getPosition(), $this->sender->getLevel()->getName(), $this->sender);
+            if($edit){
+                $canedit = "yes";
+            }else{
+                $canedit = "no";
+            }
+            $claim->displayCorners();
+            $dim = $claim->getDimensions();
+            $size = $claim->getSize();
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 This area is claimed\n&l&8>&r&7 Owner: &c".$owner."\n&l&8>&r&7 Can edit: &c".$canedit."\n&l&8>&r&7 Width: &c".$dim[0]."\n&l&8>&r&7 Length: &c".$dim[1]."\n&l&8>&r&7 Size: &c".$size));
+        }else{
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 This area is not yet claimed"));
+        }
     }
 
 }

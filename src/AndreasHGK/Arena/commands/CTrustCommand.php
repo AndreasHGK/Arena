@@ -24,7 +24,28 @@ class CTrustCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $this->sender->sendMessage("C Trust");
+        if(!$this->sender->hasPermission("claim.trust")){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+            return;
+        }elseif(!isset($this->args[1])){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
+        }
+        $cm = $this->module->claimManager;
+        if($cm->isClaimed($this->sender->getPosition(), $this->sender->getLevel()->getName())){
+            if($cm->ownsPos($this->sender->getPosition(), $this->sender->getLevel()->getName(), $this->sender)){
+                $claim = $cm->getClaim($this->sender->getPosition(), $this->sender->getLevel()->getName());
+                if(!$claim->isTrusted($this->args[1])){
+                    $claim->trust($this->args[1]);
+                    $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Trusted player &c".$this->args[1]." &7in the current claim"));
+                }else{
+                    $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Player &c".$this->args[1]." &7is already trusted in the current claim"));
+                }
+            }else{
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't own this area"));
+            }
+        }else{
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You're not in a claimed area"));
+        }
     }
 
 }

@@ -24,7 +24,21 @@ class CAbandonAllCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $this->sender->sendMessage("C Abandon All");
+        if(!$this->sender->hasPermission("claim.use")){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+            return;
+        }
+        $cm = $this->module->claimManager;
+        $success = false;
+        foreach($cm->claims[$this->sender->getName()] as $claim){
+            $claim->delete();
+            $success = true;
+        }
+        if($success){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You abandoned all your claims"));
+        }else{
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have any claims to abandon"));
+        }
     }
 
 }

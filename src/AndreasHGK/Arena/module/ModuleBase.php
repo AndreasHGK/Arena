@@ -10,7 +10,7 @@ use AndreasHGK\Arena\arena\ArenaManager;
 abstract class ModuleBase {
 
     /** @var Arena */
-    protected $arena;
+    public $arena;
     /** @var ArenaManager  */
     protected $manager;
 

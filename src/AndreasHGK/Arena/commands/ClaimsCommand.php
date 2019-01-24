@@ -36,11 +36,6 @@ class ClaimsCommand implements CommandExecutor
                 return true;
             }
             switch(strtolower($args[0])){
-                case "create":
-                    $cmd = new CCreateCommand($this->plugin, $sender, $args, $this->manager, $this->module);
-                    $cmd->execute();
-                    return true;
-                    break;
                 case "abandon":
                     $cmd = new CAbandonCommand($this->plugin, $sender, $args, $this->manager, $this->module);
                     $cmd->execute();
@@ -53,16 +48,6 @@ class ClaimsCommand implements CommandExecutor
                     break;
                 case "here":
                     $cmd = new CHereCommand($this->plugin, $sender, $args, $this->manager, $this->module);
-                    $cmd->execute();
-                    return true;
-                    break;
-                case "pos1":
-                    $cmd = new CPos1Command($this->plugin, $sender, $args, $this->manager, $this->module);
-                    $cmd->execute();
-                    return true;
-                    break;
-                case "pos2":
-                    $cmd = new CPos2Command($this->plugin, $sender, $args, $this->manager, $this->module);
                     $cmd->execute();
                     return true;
                     break;

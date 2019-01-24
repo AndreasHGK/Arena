@@ -32,9 +32,9 @@ class PersistantFFA extends ArenaClass {
     public function onKill(Player $killer, Player $killed) : void
     {
         $killer->addActionBarMessage(TextFormat::colorize("&7Killed player &4".$killed->getName()));
-        $distance = round(sqrt(pow($killed->getX() - $killer->getX(), 2) + pow($killed->getY() - $killer->getY(), 2) + pow($killed->getZ() - $killer->getZ(), 2)), 2);
+        $distance = round(sqrt(pow($killed->getX() - $killer->getX(), 2) + pow($killed->getY() - $killer->getY(), 2) + pow($killed->getZ() - $killer->getZ(), 2)), 1);
         foreach($this->getPlayers() as $player){
-            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 player &c".$killer->getName()."&7 killed &c".$killed->getName()."&8 (".$distance.")"));
+            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 player &c".$killer->getName()."&7 killed &c".$killed->getName()."&8 (".$distance."m)"));
         }
     }
 

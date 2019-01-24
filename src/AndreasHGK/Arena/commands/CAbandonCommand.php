@@ -24,7 +24,22 @@ class CAbandonCommand extends SubCommand {
     }
 
     public function execute() : void{
-        $this->sender->sendMessage("C Abandon");
+        if(!$this->sender->hasPermission("claim.use")){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+            return;
+        }
+        $cm = $this->module->claimManager;
+        if($cm->isClaimed($this->sender->getPosition(), $this->sender->getLevel())){
+            $claim = $cm->getClaim($this->sender->getPosition(), $this->sender->getLevel());
+            if($cm->ownsPos($this->sender->getPosition(), $this->sender->getLevel(), $this->sender) || $this->sender->isOp()){
+                $claim->delete();
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You have abandoned the claim"));
+            }else{
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't abandon a claim you don't own"));
+            }
+        }else{
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't abandon unclaimed land"));
+        }
     }
 
 }
