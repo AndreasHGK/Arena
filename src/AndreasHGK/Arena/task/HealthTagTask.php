@@ -29,15 +29,15 @@ class HealthTagTask extends Task {
     public function onRun(int $currentTick){
         foreach($this->arena->getServer()->getOnlinePlayers() as $player){
             if($this->manager->playerIsInArena($player)){
-                $hp = $player->getHealth()/2;
+                $hp = $player->getHealth();
                 $tag = "";
                 for($i = 0; $i < $hp; $i++){
-                    $tag = $tag."&2■";
+                    $tag = $tag."&2|";
                 }
-                for($i = 0; $i < 10-$hp; $i++){
-                    $tag = $tag."&4■";
+                for($i = 0; $i < 20-$hp; $i++){
+                    $tag = $tag."&4|";
                 }
-                $player->setScoreTag(TextFormat::colorize("&7[".$tag."&7]"));
+                $player->setScoreTag(TextFormat::colorize("&l&7[".$tag."&7]"));
             }elseif($player->getScoreTag() != NULL){
                 $player->setScoreTag("");
             }

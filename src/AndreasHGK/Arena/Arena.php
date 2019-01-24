@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena;
 
 use AndreasHGK\Arena\arena\ArenaManager;
+use AndreasHGK\Arena\module\ClaimsModule;
 use AndreasHGK\Arena\module\HealthTagModule;
 use Ds\Vector;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Config;
 use pocketmine\command\PluginCommand;
@@ -40,6 +42,7 @@ class Arena extends PluginBase implements Listener {
     private $save;
 
     private $hpmodule;
+    private $cmodule;
 
     private $format = [
         "name" => "default",
@@ -63,10 +66,14 @@ class Arena extends PluginBase implements Listener {
 	    $cmd->setDescription("join or create arenas");
 	    $cmd->setPermission("arena.command");
 	    $this->getServer()->getCommandMap()->register("arena", $cmd, "arena");
+
 	    if($this->cfg["healthtags"]){
 	        $this->hpmodule = new HealthTagModule($this, $this->manager);
 	        $this->hpmodule->execute();
         }
+
+        $this->cmodule = new ClaimsModule($this, $this->manager);
+	    $this->cmodule->execute();
 	}
 
 	public function onLoad(){
@@ -82,6 +89,16 @@ class Arena extends PluginBase implements Listener {
         $this->saveDefaultConfig();
         $this->cfg = $this->getConfig()->getAll();
         $this->load();
+    }
+
+    public function onJoin(PlayerJoinEvent $event){
+	    if($this->cfg["resetonjoin"]){
+	        $player = $event->getPlayer();
+	        $player->teleport($this->getServer()->getLevelByName($this->cfg["worldonjoin"])->getSafeSpawn());
+	        $player->setGamemode(1);
+	        $player->setHealth(20);
+	        $player->setFood(20);
+        }
     }
 
     public function getArenaManager() : ArenaManager{

@@ -13,7 +13,7 @@ permissions:
   children:
    arena.command:
     default: true
-    description: "gives access to /arena"
+    description: "gives permission to do /arena"
    arena.play:
     default: true
     description: "allows playing in arenas"
@@ -23,3 +23,9 @@ permissions:
    arena.save:
     default: op
     description: "saves all arenas"
+   claim.command:
+    default: true
+    description: "gives permission to do /claim"
+   claim.use:
+    default: false
+    description: "allows claiming land"

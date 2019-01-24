@@ -24,5 +24,7 @@ blockcommands:
   - "/warp"
   - "/hub"
 
-claims: true
 healthtags: true
+
+resetonjoin: true
+worldonjoin: "spawn"

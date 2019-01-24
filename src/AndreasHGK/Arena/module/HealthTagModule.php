@@ -17,7 +17,7 @@ class HealthTagModule extends ModuleBase {
         $handler = $this->arena->getScheduler()->scheduleRepeatingTask($task, 1);
         $task->setHandler($handler);
         $this->task = $task;
-        $this->arena->getLogger()->debug("enabled module HealthTags");
+        $this->arena->getLogger()->debug("enabled module: HealthTags");
     }
 
 }
