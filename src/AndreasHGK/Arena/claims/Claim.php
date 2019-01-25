@@ -44,6 +44,10 @@ class Claim {
         return $this->owner;
     }
 
+    public function getID() : int{
+        return $this->id;
+    }
+
     public function getLevel() : string{
         return $this->level;
     }

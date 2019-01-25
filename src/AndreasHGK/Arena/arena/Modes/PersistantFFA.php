@@ -20,45 +20,13 @@ use pocketmine\utils\TextFormat;
 
 class PersistantFFA extends ArenaClass {
 
-    protected $type;
     protected $dt = [];
 
-    public function __construct(Arena $plugin, string $name, string $creator){
-        parent::__construct($plugin, $name, $creator);
+    public function __construct(Arena $plugin, string $name, string $creator, string $level){
+        parent::__construct($plugin, $name, $creator, $level);
         $this->type = "PersistantFFA";
         $this->ffa = true;
-    }
-
-    public function onKill(Player $killer, Player $killed) : void
-    {
-        $killer->addActionBarMessage(TextFormat::colorize("&7Killed player &4".$killed->getName()));
-        $distance = round(sqrt(pow($killed->getX() - $killer->getX(), 2) + pow($killed->getY() - $killer->getY(), 2) + pow($killed->getZ() - $killer->getZ(), 2)), 1);
-        foreach($this->getPlayers() as $player){
-            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 player &c".$killer->getName()."&7 killed &c".$killed->getName()."&8 (".$distance."m)"));
-        }
-    }
-
-    public function onDeath(Player $player) : void{
-        $level = $player->getLevel();
-        $pos = new Vector3($player->getX(), $player->getY()+0.5, $player->getZ());
-
-        $task = new DeathParticleTask($this, $pos, $player->getLevel());
-        $handler = $this->arena->getScheduler()->scheduleRepeatingTask($task, 1);
-        $task->setHandler($handler);
-        $this->dt[$task->getTaskId()] = true;
-
-        $level->addSound(new AnvilFallSound($pos));
-        $level->addParticle(new EnchantParticle($pos));
-        $player->setHealth(20);
-        $player->setFood(20);
-        $player->removeAllEffects();
-        $player->getInventory()->clearAll();
-        $this->respawn($player);
-    }
-
-    public function removeTask($id) : void{
-        unset($this->dt[$id]);
-        $this->arena->getScheduler()->cancelTask($id);
+        $this->edit = false;
     }
 
 }

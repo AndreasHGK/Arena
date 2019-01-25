@@ -5,8 +5,11 @@
 # ║╔═╗║║║║╚╗║╚══╗║║─║║║║╔═╗║
 #╚╝─╚╝╚╝╚═╝╚═══╝╚╝─╚═╝╚╝─╚╝
 
-#default world for arenas.
-world: "arenas"
+#disabled worlds for claims and arenas
+disabledworlds:
+  - "spawn"
+
+autosave: 120
 
 #commands to block while player is has joined an arena
 blockcommands:

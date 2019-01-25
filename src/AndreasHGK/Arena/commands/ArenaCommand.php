@@ -81,7 +81,7 @@ class ArenaCommand implements CommandExecutor {
                         return true;
                     }elseif(isset($args[1])){
                         if($this->manager->arenaExists($args[1])){
-                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$sender->isOp()){
+                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$this->plugin->isAdminMode($sender->getName())){
                                 $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to edit this arena"));
                                 return true;
                             }
@@ -100,7 +100,7 @@ class ArenaCommand implements CommandExecutor {
                         return true;
                     }elseif(isset($args[1])){
                         if($this->manager->arenaExists($args[1])){
-                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$sender->isOp()){
+                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$this->plugin->isAdminMode($sender->getName())){
                                 $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to edit this arena"));
                                 return true;
                             }
@@ -123,7 +123,7 @@ class ArenaCommand implements CommandExecutor {
                         return true;
                     }elseif(isset($args[1])){
                         if($this->manager->arenaExists($args[1])){
-                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$sender->isOp()){
+                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$this->plugin->isAdminMode($sender->getName())){
                                 $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to edit this arena"));
                                 return true;
                             }
@@ -142,7 +142,7 @@ class ArenaCommand implements CommandExecutor {
                         return true;
                     }elseif(isset($args[1])){
                         if($this->manager->arenaExists($args[1])){
-                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$sender->isOp()){
+                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$this->plugin->isAdminMode($sender->getName())){
                                 $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to edit this arena"));
                                 return true;
                             }
@@ -165,7 +165,7 @@ class ArenaCommand implements CommandExecutor {
                         return true;
                     }elseif(isset($args[1])){
                         if($this->manager->arenaExists($args[1])){
-                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$sender->isOp()){
+                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$this->plugin->isAdminMode($sender->getName())){
                                 $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to edit this arena"));
                                 return true;
                             }
@@ -188,7 +188,7 @@ class ArenaCommand implements CommandExecutor {
                         return true;
                     }elseif(isset($args[1])){
                         if($this->manager->arenaExists($args[1])){
-                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$sender->isOp()){
+                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$this->plugin->isAdminMode($sender->getName())){
                                 $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to edit this arena"));
                                 return true;
                             }
@@ -207,7 +207,7 @@ class ArenaCommand implements CommandExecutor {
                         return true;
                     }elseif(isset($args[1])){
                         if($this->manager->arenaExists($args[1])){
-                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$sender->isOp()){
+                            if($sender->getName() != $this->manager->getArena($args[1])->getCreator() && !$this->plugin->isAdminMode($sender->getName())){
                                 $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to edit this arena"));
                                 return true;
                             }

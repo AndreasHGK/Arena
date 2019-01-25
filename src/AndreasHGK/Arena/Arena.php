@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena;
 
 use AndreasHGK\Arena\arena\ArenaManager;
+use AndreasHGK\Arena\commands\AdminCommand;
 use AndreasHGK\Arena\module\ClaimsModule;
 use AndreasHGK\Arena\module\HealthTagModule;
+use AndreasHGK\Arena\task\AutoSaveTask;
 use Ds\Vector;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -46,10 +49,16 @@ class Arena extends PluginBase implements Listener {
     /** @var ClaimsModule*/
     private $cmodule;
 
+    private $claims;
+    public $timeout = [];
+
+    private $adminmode = [];
+
     private $format = [
         "name" => "default",
         "active" => false,
         "creator" => "player",
+        "level" => NULL,
         "pos1x" => NULL,
         "pos1y" => NULL,
         "pos1z" => NULL,
@@ -60,6 +69,22 @@ class Arena extends PluginBase implements Listener {
         "type" => "PersistantFFA"
     ];
 
+    public function setAdminMode(string $player) : void{
+        $this->adminmode[$player] = true;
+    }
+
+    public function unsetAdminMode(string $player) : void{
+        unset($this->adminmode[$player]);
+    }
+
+    public function isAdminMode(string $player) : bool {
+        return isset($this->adminmode[$player]);
+    }
+
+    public function getAdminMode() : array{
+        return $this->adminmode;
+    }
+
 	public function onEnable() : void{
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
 
@@ -69,16 +94,29 @@ class Arena extends PluginBase implements Listener {
 	    $cmd->setPermission("arena.command");
 	    $this->getServer()->getCommandMap()->register("arena", $cmd, "arena");
 
+        $cmd1 = new PluginCommand("adminmode", $this);
+        $cmd1->setExecutor(new AdminCommand($this, $this->manager));
+        $cmd1->setDescription("go into or exit adminmode");
+        $cmd1->setPermission("adminmode");
+        $this->getServer()->getCommandMap()->register("arena", $cmd1, "adminmode");
+
 	    if($this->cfg["healthtags"]){
 	        $this->hpmodule = new HealthTagModule($this, $this->manager);
 	        $this->hpmodule->execute();
         }
 
-        $this->cmodule = new ClaimsModule($this, $this->manager);
+        $this->cmodule = new ClaimsModule($this, $this->manager, $this->claims);
 	    $this->cmodule->execute();
+	    $this->cmodule->load();
+
+        $task = new AutoSaveTask($this, $this->manager, $this->cmodule);
+        $handler = $this->getScheduler()->scheduleRepeatingTask($task, $this->cfg["autosave"]*20);
+        $task->setHandler($handler);
 	}
 
 	public function onLoad(){
+        @mkdir($this->getDataFolder());
+        $this->saveDefaultConfig();
         $this->manager = new ArenaManager($this);
         $this->saveResource("arenas.json");
         $config = new Config($this->getDataFolder()."arenas.json",Config::JSON,[
@@ -87,10 +125,14 @@ class Arena extends PluginBase implements Listener {
         $this->arenas = $config;
         $this->save = $config->getAll();
         $this->arenas->save();
-        @mkdir($this->getDataFolder());
-        $this->saveDefaultConfig();
+
         $this->cfg = $this->getConfig()->getAll();
         $this->load();
+        $this->saveResource("claims.json");
+        $this->claims = new Config($this->getDataFolder()."claims.json",Config::JSON,[
+            "claims" => []
+        ]);
+
     }
 
     public function onJoin(PlayerJoinEvent $event){
@@ -179,18 +221,41 @@ class Arena extends PluginBase implements Listener {
     public function onBreak(BlockBreakEvent $event){
 	    $player = $event->getPlayer();
 	    $block = $event->getBlock();
-	    if(!$this->cmodule->claimManager->canEdit($block, $block->getLevel()->getName(), $player)){
-            foreach($this->manager->getAll() as $arena){
-                if($arena->isActive()){
-                    if($arena->isInArena($event->getBlock()) && !$arena->hasPlayer($player)){
-                        $event->setCancelled();
-                        return;
-                    }elseif(!$arena->isEditable()){
-                        $event->setCancelled();
-                        return;
-                    }
-                }
-            }
+	    if($this->isAdminMode($player->getName())){
+	        return;
+        }
+        if (isset($this->timeout[$player->getName()]) && $this->timeout[$player->getName()] > microtime(true)) {
+            $event->setCancelled();
+            return;
+        }
+	    foreach($this->manager->getAll() as $arena){
+	        if($arena->isActive()){
+	            if($arena->isInArena($event->getBlock()) && !$arena->hasPlayer($player)){
+                    $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
+                    unset($this->pos[$player->getName()]);
+                    unset($this->posa[$player->getName()]);
+	                $event->setCancelled();
+                    $this->timeout[$player->getName()] = microtime(true) + 1;
+	                return;
+	            }elseif(!$arena->isEditable()){
+	                $event->setCancelled();
+                    $this->timeout[$player->getName()] = microtime(true) + 1;
+                    $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
+                    unset($this->pos[$player->getName()]);
+                    unset($this->posa[$player->getName()]);
+	                return;
+	            }else{
+	                return;
+	            }
+	        }
+	    }
+        if(!$this->cmodule->claimManager->canEdit($block, $block->getLevel()->getName(), $player)){
+            $event->setCancelled();
+            $this->timeout[$player->getName()] = microtime(true) + 1;
+            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
+            unset($this->pos[$player->getName()]);
+            unset($this->posa[$player->getName()]);
+            return;
         }elseif($this->cmodule->claimManager->isClaimed($block, $block->getLevel()->getName())){
             if(isset($this->pos[$player->getName()])){
                 if($this->pos[$player->getName()] == 1){
@@ -207,9 +272,51 @@ class Arena extends PluginBase implements Listener {
                     $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set second position"));
                 }
                 $event->setCancelled();
+                $this->timeout[$player->getName()] = microtime(true) + 1;
             }
         }elseif(isset($this->pos[$player->getName()])){
             $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can only create arenas in a claimed land that you own"));
+        }
+    }
+
+    public function onPlace(BlockPlaceEvent $event) {
+        $player = $event->getPlayer();
+        $block = $event->getBlock();
+        if($this->isAdminMode($player->getName())){
+            return;
+        }
+        if (isset($this->timeout[$player->getName()]) && $this->timeout[$player->getName()] > microtime(true)) {
+            $event->setCancelled();
+            return;
+        }
+        foreach($this->manager->getAll() as $arena){
+            if($arena->isActive()){
+                if($arena->isInArena($event->getBlock()) && !$arena->hasPlayer($player)){
+                    $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
+                    unset($this->pos[$player->getName()]);
+                    unset($this->posa[$player->getName()]);
+                    $event->setCancelled();
+                    $this->timeout[$player->getName()] = microtime(true) + 1;
+                    return;
+                }elseif(!$arena->isEditable()){
+                    $event->setCancelled();
+                    $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
+                    unset($this->pos[$player->getName()]);
+                    unset($this->posa[$player->getName()]);
+                    $this->timeout[$player->getName()] = microtime(true) + 1;
+                    return;
+                }else{
+                    return;
+                }
+            }
+        }
+        if(!$this->cmodule->claimManager->canEdit($block, $block->getLevel()->getName(), $player)){
+            $event->setCancelled();
+            $this->timeout[$player->getName()] = microtime(true) + 1;
+            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
+            unset($this->pos[$player->getName()]);
+            unset($this->posa[$player->getName()]);
+            return;
         }
     }
 
@@ -223,11 +330,13 @@ class Arena extends PluginBase implements Listener {
     public function save(){
         $this->getLogger()->debug("saving arenas...");
 	    if(!empty($this->manager->getAll())){
+	        $this->arenas->set("arenas", NULL);
             foreach($this->manager->getAll() as $arena){
                 $arenacfg = $this->format;
                 $arenacfg["name"] = $arena->getName();
                 $arenacfg["active"] = $arena->isActive();
                 $arenacfg["creator"] = $arena->getCreator();
+                $arenacfg["level"] = $arena->getLevel();
                 if($arena->pos1Isset()){
                     $arenacfg["pos1x"] = $arena->getPos1()->getX();
                     $arenacfg["pos1y"] = $arena->getPos1()->getY();
@@ -250,8 +359,9 @@ class Arena extends PluginBase implements Listener {
                 $arenacfg["type"] = $arena->getType();
                 $this->save["arenas"][$arena->getName()] = $arenacfg;
                 $this->getLogger()->debug("saved arena ".$arena->getName());
-                $this->arenas->setAll($this->save);
+
             }
+            $this->arenas->setAll($this->save);
         }else{
             $this->getLogger()->debug("there are no arenas to save!");
         }
@@ -262,7 +372,7 @@ class Arena extends PluginBase implements Listener {
         $this->getLogger()->debug("loading arenas...");
         if(!empty($this->save["arenas"])){
             foreach($this->save["arenas"] as $arena){
-                $this->manager->create($arena["name"], $arena["creator"], $arena["type"]);
+                $this->manager->create($arena["name"], $arena["creator"], $arena["type"], $arena["level"]);
                 $arenaobj = $this->manager->getArena($arena["name"]);
                     $arenaobj->setPos1(new Position($arena["pos1x"], $arena["pos1y"], $arena["pos1z"]));
                     $arenaobj->setPos2(new Position($arena["pos2x"], $arena["pos2y"], $arena["pos2z"]));
@@ -283,5 +393,6 @@ class Arena extends PluginBase implements Listener {
 
 	public function onDisable() : void{
 	    $this->save();
+	    $this->cmodule->save();
 	}
 }

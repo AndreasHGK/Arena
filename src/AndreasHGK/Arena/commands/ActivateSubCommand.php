@@ -26,7 +26,7 @@ class ActivateSubCommand extends SubCommand {
             if ($this->manager->arenaExists($arena)) {
                 $arena = $this->manager->getArena($arena);
                 $arena->activate();
-                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Activated arena &c&l".$arena->getName()));
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Activated arena &c".$arena->getName()));
             }else{
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 There is already an arena with that name"));
             }

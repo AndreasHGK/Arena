@@ -29,7 +29,7 @@ class DelspawnSubCommand extends SubCommand {
             }elseif($this->manager->getArena($arena)->spawnExists($name)){
                 $arena = $this->manager->getArena($arena);
                 $arena->delSpawn($name);
-                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deleted spawn &c&l".$name."&r&7 from arena &c&l".$arena->getName()));
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deleted spawn &c".$name."&r&7 from arena &c".$arena->getName()));
             }else{
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That spawn doesn't exist"));
             }

@@ -86,6 +86,8 @@ class ClaimManager
                 if ($claim->inClaim($pos, $level)) {
                     if ($claim->getOwner() != $player->getName() && !$claim->isTrusted($player->getName())) {
                         return false;
+                    }else{
+                        return true;
                     }
                 }
             }

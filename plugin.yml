@@ -1,6 +1,6 @@
 name: Arena
 main: AndreasHGK\Arena\Arena
-version: 1.0.0-beta
+version: 1.0.0
 api: 3.5.5
 load: POSTWORLD
 author: AndreasHGK
@@ -32,3 +32,6 @@ permissions:
    claim.trust:
     default: false
     description: "allows trusting/untrusting players"
+   adminmode:
+    default: op
+    description: "go into admin mode"

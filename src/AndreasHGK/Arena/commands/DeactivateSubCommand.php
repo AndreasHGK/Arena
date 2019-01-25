@@ -26,7 +26,7 @@ class DeactivateSubCommand extends SubCommand {
             if ($this->manager->arenaExists($arena)) {
                 $arena = $this->manager->getArena($arena);
                 $arena->deactivate();
-                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deactivated arena &c&l".$arena->getName()));
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deactivated arena &c".$arena->getName()));
             }else{
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
             }

@@ -23,9 +23,12 @@ class Pos2SubCommand extends SubCommand {
     public function execute() : void{
         if(!isset($this->args[1])){
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
+        }elseif(in_array($this->sender->getLevel()->getName(), $this->arena->cfg["disabledworlds"])){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't create an arena in this world"));
+            return;
         }elseif($this->manager->arenaExists($this->args[1])){
             $this->arena->pos($this->sender->getName(), 2, $this->args[1]);
-            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set position 2 for arena &c&l".$this->args[1]));
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set position 2 for arena &c".$this->args[1]));
         }else{
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
         }

@@ -30,7 +30,7 @@ class AddspawnSubCommand extends SubCommand {
             }elseif(!$this->manager->getArena($arena)->spawnExists($name)){
                 $arena = $this->manager->getArena($arena);
                 $arena->addSpawn($name, $this->sender->getPosition());
-                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Added spawn &c&l".$name."&r&7 in arena &c&l".$arena->getName()));
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Added spawn &c".$name."&r&7 in arena &c".$arena->getName()));
             }else{
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That spawn already exists"));
             }

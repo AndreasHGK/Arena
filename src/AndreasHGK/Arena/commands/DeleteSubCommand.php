@@ -28,7 +28,7 @@ class DeleteSubCommand extends SubCommand{
             return;
         } elseif (NULL !== $this->manager->getArena($this->args[1])) {
             $this->manager->delete($this->args[1]);
-            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deleted arena &c&l".$this->args[1]));
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Deleted arena &c".$this->args[1]));
             return;
         } else {
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));

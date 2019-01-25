@@ -26,10 +26,13 @@ class CreateSubCommand extends SubCommand{
         if (!isset($this->args[1])) {
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
             return;
+        }elseif(in_array($this->sender->getLevel()->getName(), $this->arena->cfg["disabledworlds"])){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't create an arena in this world"));
+            return;
         }if(!isset($this->args[2])){
             $this->args[2] = "FFA";
         }
-        $this->manager->create((string)$this->args[1], $this->sender->getName(), (string)$this->args[2]);
-        $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 created a &c&l".$this->args[2]."&r&7 arena named &c&l".$this->args[1]));
+        $this->manager->create((string)$this->args[1], $this->sender->getName(), (string)$this->args[2], $this->sender->getLevel()->getName());
+        $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 created arena &c".$this->args[1]."&r&7 with mode &c".$this->args[1]));
     }
 }

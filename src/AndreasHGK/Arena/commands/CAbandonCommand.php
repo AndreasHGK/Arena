@@ -31,7 +31,7 @@ class CAbandonCommand extends SubCommand {
         $cm = $this->module->claimManager;
         if($cm->isClaimed($this->sender->getPosition(), $this->sender->getLevel()->getName())){
             $claim = $cm->getClaim($this->sender->getPosition(), $this->sender->getLevel()->getName());
-            if($cm->ownsPos($this->sender->getPosition(), $this->sender->getLevel()->getName(), $this->sender) || $this->sender->isOp()){
+            if($cm->ownsPos($this->sender->getPosition(), $this->sender->getLevel()->getName(), $this->sender) || $this->arena->isAdminMode($this->sender->getName())){
                 $claim->delete();
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You have abandoned the claim"));
             }else{

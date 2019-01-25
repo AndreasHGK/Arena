@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena\arena;
 
 use AndreasHGK\Arena\Arena;
+use AndreasHGK\Arena\task\DeathParticleTask;
 use pocketmine\block\SnowLayer;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\level\particle\EnchantParticle;
 use pocketmine\level\Position;
 use pocketmine\level\sound\AnvilFallSound;
 use pocketmine\level\sound\EndermanTeleportSound;
@@ -26,14 +28,16 @@ abstract class ArenaClass{
     protected $name;
     protected $creator;
     protected $type;
+    protected $level;
 
     protected $players = [];
     protected $ffa;
     protected $spawns = [];
 
     protected $edit;
+    protected $dt = [];
 
-    public function __construct(Arena $arena, string $name, string $creator){
+    public function __construct(Arena $arena, string $name, string $creator, string $level){
         $this->active = false;
         $this->arena = $arena;
         $this->name = $name;
@@ -41,10 +45,15 @@ abstract class ArenaClass{
         $this->type = "default";
         $this->ffa = true;
         $this->edit = false;
+        $this->level = $level;
     }
 
     public function isEditable() : bool{
         return $this->edit;
+    }
+
+    public function getLevel() : string {
+        return $this->level;
     }
 
     public function getPlugin() : Arena{
@@ -115,8 +124,36 @@ abstract class ArenaClass{
         $this->onLeave($player);
     }
 
-    abstract public function onKill(Player $killer, Player $killed) : void;
-    abstract public function onDeath(Player $player) : void;
+    public function onKill(Player $killer, Player $killed) : void
+    {
+        $killer->addActionBarMessage(TextFormat::colorize("&7Killed player &4".$killed->getName()));
+        $distance = round(sqrt(pow($killed->getX() - $killer->getX(), 2) + pow($killed->getY() - $killer->getY(), 2) + pow($killed->getZ() - $killer->getZ(), 2)), 1);
+        foreach($this->getPlayers() as $player){
+            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 player &c".$killer->getName()."&7 killed &c".$killed->getName()."&8 (".$distance."m)"));
+        }
+    }
+
+    public function onDeath(Player $player) : void{
+        $level = $player->getLevel();
+        $pos = new Vector3($player->getX(), $player->getY()+0.5, $player->getZ());
+
+        $task = new DeathParticleTask($this, $pos, $player->getLevel());
+        $handler = $this->arena->getScheduler()->scheduleRepeatingTask($task, 1);
+        $task->setHandler($handler);
+        $this->dt[$task->getTaskId()] = true;
+
+        $level->addSound(new AnvilFallSound($pos));
+        $player->setHealth(20);
+        $player->setFood(20);
+        $player->removeAllEffects();
+        $player->getInventory()->clearAll();
+        $this->respawn($player);
+    }
+
+    public function removeTask($id) : void{
+        unset($this->dt[$id]);
+        $this->arena->getScheduler()->cancelTask($id);
+    }
 
     public function getSpawns(){
         return $this->spawns;

@@ -20,14 +20,14 @@ class ArenaManager{
         $this->plugin = $plugin;
     }
 
-    public function create(string $name, string $creator, string $type) : void{
+    public function create(string $name, string $creator, string $type, string $level) : void{
         switch(strtolower($type)){
             case "freeforall":
             case "ffa":
-                $arena = new PersistantFFA($this->plugin, $name, $creator);
+                $arena = new PersistantFFA($this->plugin, $name, $creator, $level);
                 break;
             default:
-                $arena = new PersistantFFA($this->plugin, $name, $creator);
+                $arena = new PersistantFFA($this->plugin, $name, $creator, $level);
                 break;
         }
         $this->arenas[$arena->getName()] = $arena;
