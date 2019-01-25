@@ -51,12 +51,12 @@ class ClaimsCommand implements CommandExecutor
                     $cmd->execute();
                     return true;
                     break;
-                case "allow":
+                case "trust":
                     $cmd = new CTrustCommand($this->plugin, $sender, $args, $this->manager, $this->module);
                     $cmd->execute();
                     return true;
                     break;
-                case "deny":
+                case "untrust":
                     $cmd = new CUntrustCommand($this->plugin, $sender, $args, $this->manager, $this->module);
                     $cmd->execute();
                     return true;

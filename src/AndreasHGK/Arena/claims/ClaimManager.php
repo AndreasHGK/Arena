@@ -84,14 +84,14 @@ class ClaimManager
         foreach ($this->claims as $key) {
             foreach($key as $claim){
                 if ($claim->inClaim($pos, $level)) {
-                    if ($claim->getOwner() == $player->getName() || $claim->isTrusted($player->getName())) {
-                        return true;
+                    if ($claim->getOwner() != $player->getName() && !$claim->isTrusted($player->getName())) {
+                        return false;
                     }
                 }
             }
 
         }
-        return false;
+        return true;
     }
 
     public function getClaim(Position $pos, string $level): Claim

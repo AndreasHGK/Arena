@@ -29,6 +29,7 @@ class CTrustCommand extends SubCommand {
             return;
         }elseif(!isset($this->args[1])){
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
+            return;
         }
         $cm = $this->module->claimManager;
         if($cm->isClaimed($this->sender->getPosition(), $this->sender->getLevel()->getName())){
