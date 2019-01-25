@@ -79,7 +79,7 @@ class ArenaManager{
         }
         if(!$this->playerIsInArena($player)){
             if(isset($arena)){
-                $player->teleport($this->plugin->getServer()->getLevelByName($this->plugin->cfg["world"])->getSafeSpawn());
+                $player->teleport($this->plugin->getServer()->getLevelByName($arena->getLevel())->getSafeSpawn());
                 $arena->addPlayer($player);
             }
         }

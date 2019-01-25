@@ -68,6 +68,10 @@ class ArenaCommand implements CommandExecutor {
                         $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this while in an arena"));
                         return true;
                     }
+                    if(in_array($sender->getLevel()->getName(), $this->plugin->cfg["disabledworlds"])){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this in this world"));
+                        return true;
+                    }
                     $cmd = new CreateSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
@@ -106,7 +110,7 @@ class ArenaCommand implements CommandExecutor {
                             }
                         }
                     }
-                    if($sender->getLevel()->getName() != $this->plugin->cfg["world"]){
+                    if(in_array($sender->getLevel()->getName(), $this->plugin->cfg["disabledworlds"])){
                         $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this in this world"));
                         return true;
                     }
@@ -129,6 +133,7 @@ class ArenaCommand implements CommandExecutor {
                             }
                         }
                     }
+
                     $cmd = new DelspawnSubCommand($this->plugin, $sender, $args, $this->manager);
                     $cmd->execute();
                     return true;
@@ -148,7 +153,7 @@ class ArenaCommand implements CommandExecutor {
                             }
                         }
                     }
-                    if($sender->getLevel()->getName() != $this->plugin->cfg["world"]){
+                    if(in_array($sender->getLevel()->getName(), $this->plugin->cfg["disabledworlds"])){
                         $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this in this world"));
                         return true;
                     }
@@ -171,7 +176,7 @@ class ArenaCommand implements CommandExecutor {
                             }
                         }
                     }
-                    if($sender->getLevel()->getName() != $this->plugin->cfg["world"]){
+                    if(in_array($sender->getLevel()->getName(), $this->plugin->cfg["disabledworlds"])){
                         $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't do this in this world"));
                         return true;
                     }
