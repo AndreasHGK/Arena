@@ -217,6 +217,9 @@ abstract class ArenaClass{
         $player->setFood(20);
         $player->removeAllEffects();
         $player->setGamemode(0);
+        foreach($this->players as $playera){
+            $playera->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 joined the arena"));
+        }
     }
 
     public function onLeave(Player $player) : void{
@@ -228,10 +231,20 @@ abstract class ArenaClass{
         $player->removeAllEffects();
         $player->getInventory()->clearAll();
         $player->setGamemode(1);
+        foreach($this->players as $playera){
+            $playera->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 left the arena"));
+        }
     }
 
     public function isInArena(Position $pos) : bool{
-        if($pos->getX() >= min($this->pos1->getX(), $this->pos2->getX()) && $pos->getX() <= max($this->pos1->getX(), $this->pos2->getX()) && $pos->getY() >= min($this->pos1->getY(), $this->pos2->getY()) && $pos->getY() <= max($this->pos1->getY(), $this->pos2->getY()) && $pos->getZ() >= min($this->pos1->getZ(), $this->pos2->getZ()) && $pos->getZ() <= max($this->pos1->getZ(), $this->pos2->getZ())){
+        if($pos->getLevel()->getName() == $this->level && $pos->getX() >= min($this->pos1->getX(), $this->pos2->getX()) && $pos->getX() <= max($this->pos1->getX(), $this->pos2->getX()) && $pos->getY() >= min($this->pos1->getY(), $this->pos2->getY()) && $pos->getY() <= max($this->pos1->getY(), $this->pos2->getY()) && $pos->getZ() >= min($this->pos1->getZ(), $this->pos2->getZ()) && $pos->getZ() <= max($this->pos1->getZ(), $this->pos2->getZ())){
+            return true;
+        }
+        return false;
+    }
+
+    public function isInBottomLayer(Position $pos) : bool{
+        if($pos->getLevel()->getName() == $this->level && $pos->getY() <= min($this->pos1->getY(), $this->pos2->getY())){
             return true;
         }
         return false;

@@ -206,6 +206,13 @@ class Arena extends PluginBase implements Listener {
     }
 
     public function onEntityDamage(EntityDamageByEntityEvent $event){
+        if($event->getEntity() instanceof Player && $event->getDamager() instanceof Player){
+            if($this->manager->playerIsInArena($event->getEntity()) && !$this->manager->playerIsInArena($event->getDamager())){
+                $event->setCancelled();
+                $event->getDamager()->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't hurt players while they are in an arena"));
+                return;
+            }
+        }
         if($event->getFinalDamage() >= $event->getEntity()->getHealth() && $event->getEntity() instanceof Player && $event->getDamager() instanceof Player) {
             $player = $event->getEntity();
             if($this->manager->playerIsInArena($player)){
@@ -219,9 +226,17 @@ class Arena extends PluginBase implements Listener {
 
     public function onMove(PlayerMoveEvent $event){
 	    $player = $event->getPlayer();
+        if ($event->getPlayer()->getY() < -2 && $this->cfg["novoid"]) {
+            $player->teleport($this->getServer()->getLevelByName($this->cfg["spawnworld"])->getSafeSpawn());
+            $event->getPlayer()->sendMessage(TextFormat::RED . TextFormat::BOLD ."§l§8[§c!§8]§r§7 You fell in void, teleporting back to spawn.");
+            return;
+        }
 	    if($this->manager->playerIsInArena($player)){
             $arena = $this->manager->getPlayerArena($player);
-            if(!$arena->isInArena($player->getPosition())){
+            if($arena->isInBottomLayer($player->getPosition())){
+                $arena->respawn($player);
+                $event->getPlayer()->sendMessage(TextFormat::RED . TextFormat::BOLD ."§l§8[§c!§8]§r§7 You fell under the arena, teleporting back to arena.");
+            }if(!$arena->isInArena($player->getPosition())){
                 $event->setCancelled();
             }
         }

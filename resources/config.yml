@@ -54,3 +54,4 @@ servers:
 
 resetonjoin: true
 gotospawnonjoin: false
+novoid: true
