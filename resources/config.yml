@@ -28,6 +28,19 @@ blockcommands:
   - "/hub"
 
 healthtags: true
+# /server, /spawn and /wild
+teleportmodule: true
+
+wildworld: "world"
+#a square area. if set as 1000 range of X and Z will be -1000,1000
+wildradius: 2000
+
+spawnworld: "spawn"
+
+servers:
+  skyblock:
+    name: "skyblock"
+    ip: "play.emperials.net"
+    port: 19132
 
 resetonjoin: true
-worldonjoin: "spawn"

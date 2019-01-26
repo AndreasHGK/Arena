@@ -35,3 +35,12 @@ permissions:
    adminmode:
     default: op
     description: "go into admin mode"
+   arena.server:
+    default: true
+    description: "transfer to another server"
+   arena.spawn:
+    default: true
+    description: "teleport to spawn"
+   arena.wild:
+    default: true
+    description: "go to wild"

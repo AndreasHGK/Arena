@@ -8,6 +8,7 @@ use AndreasHGK\Arena\arena\ArenaManager;
 use AndreasHGK\Arena\commands\AdminCommand;
 use AndreasHGK\Arena\module\ClaimsModule;
 use AndreasHGK\Arena\module\HealthTagModule;
+use AndreasHGK\Arena\module\TeleportModule;
 use AndreasHGK\Arena\task\AutoSaveTask;
 use Ds\Vector;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -48,6 +49,8 @@ class Arena extends PluginBase implements Listener {
     private $hpmodule;
     /** @var ClaimsModule*/
     private $cmodule;
+    /** @var TeleportModule*/
+    private $tpmodule;
 
     private $claims;
     public $timeout = [];
@@ -104,6 +107,10 @@ class Arena extends PluginBase implements Listener {
 	        $this->hpmodule = new HealthTagModule($this, $this->manager);
 	        $this->hpmodule->execute();
         }
+        if($this->cfg["teleportmodule"]){
+            $this->tpmodule = new TeleportModule($this, $this->manager);
+            $this->tpmodule->execute();
+        }
 
         $this->cmodule = new ClaimsModule($this, $this->manager, $this->claims);
 	    $this->cmodule->execute();
@@ -138,7 +145,7 @@ class Arena extends PluginBase implements Listener {
     public function onJoin(PlayerJoinEvent $event){
 	    if($this->cfg["resetonjoin"]){
 	        $player = $event->getPlayer();
-	        $player->teleport($this->getServer()->getLevelByName($this->cfg["worldonjoin"])->getSafeSpawn());
+	        $player->teleport($this->getServer()->getLevelByName($this->cfg["spawnworld"])->getSafeSpawn());
 	        $player->setGamemode(1);
 	        $player->setHealth(20);
 	        $player->setFood(20);
@@ -237,7 +244,7 @@ class Arena extends PluginBase implements Listener {
 	                $event->setCancelled();
                     $this->timeout[$player->getName()] = microtime(true) + 1;
 	                return;
-	            }elseif(!$arena->isEditable()){
+	            }elseif($arena->isInArena($event->getBlock()) && !$arena->isEditable()){
 	                $event->setCancelled();
                     $this->timeout[$player->getName()] = microtime(true) + 1;
                     $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
