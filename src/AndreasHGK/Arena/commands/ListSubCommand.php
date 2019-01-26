@@ -23,21 +23,27 @@ class ListSubCommand extends SubCommand {
 
     public function execute() : void{
         #todo: LIST PAGES
-        if(isset($this->args[1])){
-            $page = $this->args[1];
+        if(!isset($this->args[1])){
+            $page = 1;
         }elseif($this->args[1] < 1){
             $page = 1;
         }else{
-            $page = 1;
+            $page = $this->args[1];
         }
         $str = "&l&8[&c!&8]&r&7 arenas (page ".$page."): &c";
-        $start = $this->pagesize*($page);
+        $start = $this->pagesize*($page)-$this->pagesize;
         $int = 0;
+        $empty = true;
         foreach($this->manager->getAll() as $arena){
             $int++;
             if($int >= $start && $int <= $start+$this->pagesize){
                 $str = $str.$arena->getName()."&r&7, &c";
+                $empty = false;
             }
+        }
+        if($empty == true){
+            $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 There are no arenas to show on this page"));
+            return;
         }
         $this->sender->sendMessage(TextFormat::colorize($str));
     }
