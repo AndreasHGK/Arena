@@ -7,6 +7,8 @@ namespace AndreasHGK\Arena\arena;
 use AndreasHGK\Arena\Arena;
 use AndreasHGK\Arena\task\DeathParticleTask;
 use pocketmine\block\SnowLayer;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -193,9 +195,17 @@ abstract class ArenaClass{
         $player->getArmorInventory()->setBoots(ItemFactory::get(ItemIds::IRON_BOOTS, 0, 1));
         $inv = $player->getInventory();
         $inv->setItem(0, ItemFactory::get(ItemIds::DIAMOND_SWORD, 0, 1));
-        $inv->setItem(1, ItemFactory::get(ItemIds::BOW, 0, 1));
+        $bow = ItemFactory::get(ItemIds::BOW, 0, 1);
+        $ench1 = Enchantment::getEnchantment(19);
+        $enchInstance = new EnchantmentInstance($ench1, 3);
+        $enchInstance->setLevel(4);
+        $ench2 = Enchantment::getEnchantment(20);
+        $enchInstance2 = new EnchantmentInstance($ench2, 1);
+        $enchInstance2->setLevel(2);
+        $bow->addEnchantment($enchInstance);
+        $bow->addEnchantment($enchInstance2);
+        $inv->setItem(1, $bow);
         $inv->setItem(2, ItemFactory::get(ItemIds::ARROW, 0, 64));
-        $inv->setItem(8, ItemFactory::get(ItemIds::STEAK, 0, 64));
     }
 
     public function onJoin(Player $player) : void{
@@ -210,7 +220,7 @@ abstract class ArenaClass{
     }
 
     public function onLeave(Player $player) : void{
-        $player->teleport($player->getLevel()->getSafeSpawn());
+        $player->teleport($this->arena->getServer()->getLevelByName($this->arena->cfg["spawnworld"])->getSafeSpawn());
         $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
         $player->addSubTitle(TextFormat::colorize("&7Left arena &c".$this->name));
         $player->setHealth(20);

@@ -145,10 +145,12 @@ class Arena extends PluginBase implements Listener {
     public function onJoin(PlayerJoinEvent $event){
 	    if($this->cfg["resetonjoin"]){
 	        $player = $event->getPlayer();
-	        $player->teleport($this->getServer()->getLevelByName($this->cfg["spawnworld"])->getSafeSpawn());
 	        $player->setGamemode(1);
 	        $player->setHealth(20);
 	        $player->setFood(20);
+        }
+        if($this->cfg["gotospawnonjoin"]){
+            $player->teleport($this->getServer()->getLevelByName($this->cfg["spawnworld"])->getSafeSpawn());
         }
     }
 
@@ -305,7 +307,7 @@ class Arena extends PluginBase implements Listener {
                     $event->setCancelled();
                     $this->timeout[$player->getName()] = microtime(true) + 1;
                     return;
-                }elseif(!$arena->isEditable()){
+                }elseif($arena->isInArena($event->getBlock()) && !$arena->isEditable()){
                     $event->setCancelled();
                     $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
                     unset($this->pos[$player->getName()]);

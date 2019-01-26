@@ -53,7 +53,7 @@ class Claim {
     }
 
     public function trust(string $player) : void{
-        $this->trusted[$player] = true;
+        $this->trusted[$player] = $player;
     }
 
     public function unTrust(string $player) : void{

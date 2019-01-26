@@ -23,9 +23,18 @@ blockcommands:
   - "/kit"
   - "/invis"
   - "/vanish"
-  - "/spawn"
   - "/warp"
   - "/hub"
+  - "/freeze"
+  - "/gmspc"
+  - "/gmc"
+  - "/gma"
+  - "/enchant"
+  - "/god"
+  - "/spawn"
+  - "/wild"
+  - "/home"
+  - "/clearinv"
 
 healthtags: true
 # /server, /spawn and /wild
@@ -44,3 +53,4 @@ servers:
     port: 19132
 
 resetonjoin: true
+gotospawnonjoin: false
