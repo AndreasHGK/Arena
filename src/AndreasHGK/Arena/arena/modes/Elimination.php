@@ -6,6 +6,7 @@ namespace AndreasHGK\Arena\arena\modes;
 
 use AndreasHGK\Arena\Arena;
 use AndreasHGK\Arena\arena\ArenaClass;
+use AndreasHGK\Arena\arena\TimedArena;
 use AndreasHGK\Arena\task\DeathParticleTask;
 use pocketmine\level\particle\EnchantParticle;
 use pocketmine\level\particle\ExplodeParticle;
@@ -18,13 +19,12 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class PersistantFFA extends ArenaClass {
+class Elimination extends TimedArena {
 
     public function __construct(Arena $plugin, string $name, string $creator, string $level){
         parent::__construct($plugin, $name, $creator, $level);
-        $this->type = "PersistantFFA";
+        $this->type = "Elimination";
         $this->ffa = true;
-        $this->edit = false;
     }
 
 }

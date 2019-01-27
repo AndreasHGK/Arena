@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena\arena;
 
 use AndreasHGK\Arena\Arena;
+use AndreasHGK\Arena\arena\modes\Elimination;
 use AndreasHGK\Arena\arena\modes\PersistantFFA;
+use AndreasHGK\Arena\arena\TimedArena;
 use pocketmine\level\Level;
 use pocketmine\network\mcpe\protocol\LabTablePacket;
 use pocketmine\Player;
@@ -25,6 +27,9 @@ class ArenaManager{
             case "freeforall":
             case "ffa":
                 $arena = new PersistantFFA($this->plugin, $name, $creator, $level);
+                break;
+            case "elimination":
+                $arena = new Elimination($this->plugin, $name, $creator, $level);
                 break;
             default:
                 $arena = new PersistantFFA($this->plugin, $name, $creator, $level);

@@ -226,6 +226,10 @@ class Arena extends PluginBase implements Listener {
 
     public function onMove(PlayerMoveEvent $event){
 	    $player = $event->getPlayer();
+        if($this->manager->playerIsInArena($player) && !$this->manager->getPlayerArena($player)->isRunning()){
+            $event->setCancelled();
+            return;
+        }
         if ($event->getPlayer()->getY() < -2 && $this->cfg["novoid"]) {
             $player->teleport($this->getServer()->getLevelByName($this->cfg["spawnworld"])->getSafeSpawn());
             $event->getPlayer()->sendMessage(TextFormat::RED . TextFormat::BOLD ."§l§8[§c!§8]§r§7 You fell in void, teleporting back to spawn.");
@@ -268,7 +272,7 @@ class Arena extends PluginBase implements Listener {
                     unset($this->pos[$player->getName()]);
                     unset($this->posa[$player->getName()]);
 	                return;
-	            }else{
+	            }elseif($arena->isInArena($event->getBlock()) && $arena->hasPlayer($player)){
 	                return;
 	            }
 	        }

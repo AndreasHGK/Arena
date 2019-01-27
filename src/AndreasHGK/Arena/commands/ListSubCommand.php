@@ -22,7 +22,6 @@ class ListSubCommand extends SubCommand {
     }
 
     public function execute() : void{
-        #todo: LIST PAGES
         if(!isset($this->args[1])){
             $page = 1;
         }elseif($this->args[1] < 1){
@@ -30,14 +29,14 @@ class ListSubCommand extends SubCommand {
         }else{
             $page = $this->args[1];
         }
-        $str = "&l&8[&c!&8]&r&7 arenas (page ".$page."): &c";
+        $str = "&l&8[&c!&8]&r&7 arenas (page ".$page."):";
         $start = $this->pagesize*($page)-$this->pagesize;
         $int = 0;
         $empty = true;
         foreach($this->manager->getAll() as $arena){
             $int++;
             if($int >= $start && $int <= $start+$this->pagesize){
-                $str = $str.$arena->getName()."&r&7, &c";
+                $str = $str."\n&8&l> &r&c".$arena->getName()."&7 by &c".$arena->getCreator();
                 $empty = false;
             }
         }

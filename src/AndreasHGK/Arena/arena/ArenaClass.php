@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace AndreasHGK\Arena\arena;
 
 use AndreasHGK\Arena\Arena;
+
 use AndreasHGK\Arena\task\DeathParticleTask;
-use pocketmine\block\SnowLayer;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
-use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\level\particle\EnchantParticle;
 use pocketmine\level\Position;
 use pocketmine\level\sound\AnvilFallSound;
-use pocketmine\level\sound\EndermanTeleportSound;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -32,12 +29,19 @@ abstract class ArenaClass{
     protected $type;
     protected $level;
 
+    protected $running;
+
     protected $players = [];
     protected $ffa;
     protected $spawns = [];
 
     protected $edit;
     protected $dt = [];
+    protected $timed;
+    protected $max;
+
+    protected $minplayers;
+
 
     public function __construct(Arena $arena, string $name, string $creator, string $level){
         $this->active = false;
@@ -48,6 +52,34 @@ abstract class ArenaClass{
         $this->ffa = true;
         $this->edit = false;
         $this->level = $level;
+        $this->timed = false;
+        $this->max = 10;
+        $this->running = true;
+        $this->minplayers = 1;
+    }
+
+    public function getMinPlayers() : int{
+        return $this->minplayers;
+    }
+
+    public function setRunning() : void{
+        $this->running = true;
+    }
+
+    public function unsetRunning() : void{
+        $this->running = false;
+    }
+
+    public function isTimed() : bool{
+        return $this->timed;
+    }
+
+    public function getMaxPlayers() : int{
+        return $this->max;
+    }
+
+    public function getPlayerCount() : int{
+        return count($this->players);
     }
 
     public function isEditable() : bool{
@@ -121,18 +153,36 @@ abstract class ArenaClass{
        $this->onJoin($player);
     }
 
-    public function removePlayer(Player $player) : void{
+    public function removePlayer(Player $player, bool $silent = false, bool $no = false) : void{
         unset($this->players[$player->getName()]);
-        $this->onLeave($player);
+        $this->onLeave($player, $silent, $no);
+    }
+
+    public function isRunning() : bool{
+        return $this->running;
+    }
+
+    public function canJoin() : bool{
+        if($this->getPlayerCount() < $this->getMaxPlayers()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function isFull() : bool{
+        if($this->getMaxPlayers() == $this->getPlayerCount()){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function onKill(Player $killer, Player $killed) : void
     {
         $killer->addActionBarMessage(TextFormat::colorize("&7Killed player &4".$killed->getName()));
         $distance = round(sqrt(pow($killed->getX() - $killer->getX(), 2) + pow($killed->getY() - $killer->getY(), 2) + pow($killed->getZ() - $killer->getZ(), 2)), 1);
-        foreach($this->getPlayers() as $player){
-            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 player &c".$killer->getName()."&7 killed &c".$killed->getName()."&8 (".$distance."m)"));
-        }
+        $this->broadcast("&l&8[&c!&8]&r&7 player &c".$killer->getName()."&7 killed &c".$killed->getName()."&8 (".$distance."m)");
     }
 
     public function onDeath(Player $player) : void{
@@ -198,17 +248,17 @@ abstract class ArenaClass{
         $bow = ItemFactory::get(ItemIds::BOW, 0, 1);
         $ench1 = Enchantment::getEnchantment(19);
         $enchInstance = new EnchantmentInstance($ench1, 3);
-        $enchInstance->setLevel(4);
-        $ench2 = Enchantment::getEnchantment(20);
-        $enchInstance2 = new EnchantmentInstance($ench2, 1);
-        $enchInstance2->setLevel(2);
+        $enchInstance->setLevel(2);
         $bow->addEnchantment($enchInstance);
-        $bow->addEnchantment($enchInstance2);
         $inv->setItem(1, $bow);
         $inv->setItem(2, ItemFactory::get(ItemIds::ARROW, 0, 64));
     }
 
     public function onJoin(Player $player) : void{
+        if(!$this->canJoin()){
+            $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 This arena is full"));
+            return;
+        }
         $player->getInventory()->clearAll();
         $this->respawn($player);
         $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
@@ -217,22 +267,48 @@ abstract class ArenaClass{
         $player->setFood(20);
         $player->removeAllEffects();
         $player->setGamemode(0);
-        foreach($this->players as $playera){
-            $playera->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 joined the arena"));
+        $this->broadcast("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 joined the arena &8(".$this->getPlayerCount()."/".$this->getMaxPlayers().")");
+    }
+
+    public function broadcast(string $message) : void{
+        foreach($this->players as $player){
+            $player->sendMessage(TextFormat::colorize($message));
         }
     }
 
-    public function onLeave(Player $player) : void{
+    public function broadcastTitle(string $message) : void{
+        foreach($this->players as $player){
+            $player->addTitle(TextFormat::colorize($message));
+        }
+    }
+
+    public function broadcastSubTitle(string $message) : void{
+        foreach($this->players as $player){
+            $player->addSubTitle(TextFormat::colorize($message));
+        }
+    }
+
+    public function onLeave(Player $player, bool $silent = false, bool $noshowpop = false) : void{
         $player->teleport($this->arena->getServer()->getLevelByName($this->arena->cfg["spawnworld"])->getSafeSpawn());
-        $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
-        $player->addSubTitle(TextFormat::colorize("&7Left arena &c".$this->name));
         $player->setHealth(20);
         $player->setFood(20);
         $player->removeAllEffects();
+        $player->getArmorInventory()->clearAll();
         $player->getInventory()->clearAll();
         $player->setGamemode(1);
-        foreach($this->players as $playera){
-            $playera->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 left the arena"));
+        if(!$noshowpop){
+            $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
+            $player->addSubTitle(TextFormat::colorize("&7Left arena &c".$this->name));
+        }
+        if(!$silent){
+
+            $this->broadcast("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 left the arena &8(".$this->getPlayerCount()."/".$this->getMaxPlayers().")");
+        }
+    }
+
+    public function kickAll(bool $silent = true, bool $no = false) : void{
+        foreach($this->getPlayers() as $player){
+            $this->removePlayer($player, $silent, $no);
         }
     }
 
