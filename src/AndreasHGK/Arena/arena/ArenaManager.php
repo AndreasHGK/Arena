@@ -44,8 +44,28 @@ class ArenaManager{
         }
     }
 
-    public function getAll(){
+    public function getAll() : array {
         return $this->arenas;
+    }
+
+    public function getAllSorted() : array{
+        $arenas = [];
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 2){
+                array_push($arenas, $arena);
+            }
+        }
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 1){
+                array_push($arenas, $arena);
+            }
+        }
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 0){
+                array_push($arenas, $arena);
+            }
+        }
+        return $arenas;
     }
 
     public function getArena(string $name){

@@ -31,7 +31,6 @@ class ArenaTimerTask extends Task {
     {
         if ($this->ticks >= $this->time) {
             $this->arena->stop();
-            $this->arena->removeTimer($this->getTaskId());
             return;
         }
         $this->ticks++;
@@ -64,11 +63,16 @@ class ArenaTimerTask extends Task {
     }
 
     public function skipWait() : void{
-        $this->ticks = -100;
+        $this->ticks = -101;
     }
 
     public function restartWait() : void{
         $this->ticks = -($this->countdown);
+    }
+
+    public function stop() : void{
+        $this->arena->unsetRunning();
+        $this->arena->removeTimer($this->getTaskId());
     }
 
 }

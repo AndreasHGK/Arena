@@ -37,6 +37,6 @@ class CreateSubCommand extends SubCommand{
             return;
         }
         $this->manager->create((string)$this->args[1], $this->sender->getName(), (string)$this->args[2], $this->sender->getLevel()->getName());
-        $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 created arena &c".$this->args[1]."&r&7 with mode &c".$this->args[1]));
+        $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 created arena &c".$this->args[1]."&r&7 with mode &c".$this->args[2]));
     }
 }

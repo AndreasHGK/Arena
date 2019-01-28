@@ -69,7 +69,8 @@ class Arena extends PluginBase implements Listener {
         "pos2y" => NULL,
         "pos2z" => NULL,
         "spawns" => [],
-        "type" => "PersistantFFA"
+        "type" => "PersistantFFA",
+        "status" => 0
     ];
 
     public function setAdminMode(string $player) : void{
@@ -385,6 +386,7 @@ class Arena extends PluginBase implements Listener {
                     }
                 }
                 $arenacfg["type"] = $arena->getType();
+                $arenacfg["status"] = $arena->getStatus();
                 $this->save["arenas"][$arena->getName()] = $arenacfg;
                 $this->getLogger()->debug("saved arena ".$arena->getName());
 
@@ -404,6 +406,9 @@ class Arena extends PluginBase implements Listener {
                 $arenaobj = $this->manager->getArena($arena["name"]);
                     $arenaobj->setPos1(new Position($arena["pos1x"], $arena["pos1y"], $arena["pos1z"]));
                     $arenaobj->setPos2(new Position($arena["pos2x"], $arena["pos2y"], $arena["pos2z"]));
+                    if(isset($arena["status"])){
+                        $arenaobj->setStatus($arena["status"]);
+                    }
                 if(!empty($arena["spawns"])){
                     foreach($arena["spawns"] as $spawn){
                         $arenaobj->addSpawn($spawn["name"], new Position($spawn["x"], $spawn["y"], $spawn["z"]));

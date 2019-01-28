@@ -223,11 +223,29 @@ class ArenaCommand implements CommandExecutor {
                     return true;
                     break;
                 case "save":
-                    if(!$sender->hasPermission("arena.save")){
+                    if(!$sender->hasPermission("arena.admin")){
                         $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
                         return true;
                     }
                     $this->plugin->save();
+                    return true;
+                    break;
+                case "status":
+                    if(!$sender->hasPermission("arena.admin")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
+                    $cmd = new StatusSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
+                case "start":
+                    if(!$sender->hasPermission("arena.skip")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
+                    $cmd = new StartSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
                     return true;
                     break;
                 default:

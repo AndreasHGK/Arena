@@ -28,6 +28,7 @@ abstract class ArenaClass{
     protected $creator;
     protected $type;
     protected $level;
+    protected $status;
 
     protected $running;
 
@@ -39,7 +40,6 @@ abstract class ArenaClass{
     protected $dt = [];
     protected $timed;
     protected $max;
-
     protected $minplayers;
 
 
@@ -56,10 +56,33 @@ abstract class ArenaClass{
         $this->max = 10;
         $this->running = true;
         $this->minplayers = 1;
+        $this->status = 0;
+    }
+
+    public function allowSkip() : bool{
+        return false;
     }
 
     public function getMinPlayers() : int{
         return $this->minplayers;
+    }
+
+    public function getStatus() : int{
+        return $this->status;
+    }
+
+    public function getStatusString() : string {
+        if($this->status == 0){
+            return "community";
+        }elseif($this->status == 1){
+            return "featured";
+        }elseif($this->status == 2){
+            return "official";
+        }
+    }
+
+    public function setStatus(int $status) : void{
+        $this->status = $status;
     }
 
     public function setRunning() : void{

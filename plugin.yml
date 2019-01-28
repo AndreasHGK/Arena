@@ -20,7 +20,10 @@ permissions:
    arena.create:
     default: false
     description: "allows creation of arenas"
-   arena.save:
+   arena.skip:
+    default: false
+    description: "skip arena timer"
+   arena.admin:
     default: op
     description: "saves all arenas"
    claim.command:

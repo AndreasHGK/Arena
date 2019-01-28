@@ -14,7 +14,7 @@ use pocketmine\utils\TextFormat;
 class ListSubCommand extends SubCommand {
 
     protected $manager;
-    private $pagesize = 2;
+    private $pagesize = 10;
 
     public function __construct(Arena $arena, CommandSender $sender, array $args, ArenaManager $manager){
         parent::__construct($arena, $sender, $args);
@@ -29,14 +29,20 @@ class ListSubCommand extends SubCommand {
         }else{
             $page = $this->args[1];
         }
-        $str = "&l&8[&c!&8]&r&7 arenas (page ".$page."):";
+        $str = "&l&8[&c!&8]&r&7 Arenas (page ".$page."):";
         $start = $this->pagesize*($page)-$this->pagesize;
         $int = 0;
         $empty = true;
-        foreach($this->manager->getAll() as $arena){
+        foreach($this->manager->getAllSorted() as $arena){
             $int++;
             if($int >= $start && $int <= $start+$this->pagesize){
-                $str = $str."\n&8&l> &r&c".$arena->getName()."&7 by &c".$arena->getCreator();
+                $str = $str."\n&8&l> ";
+                if($arena->getStatus() == 1){
+                    $str = $str."&r&l&6[Featured] ";
+                }elseif($arena->getStatus() == 2){
+                    $str = $str."&r&l&9[Official] ";
+                }
+                $str = $str."&r&c".$arena->getName()."&7 by &c".$arena->getCreator()."&8 (".$arena->getType().")";
                 $empty = false;
             }
         }

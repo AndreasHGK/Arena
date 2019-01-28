@@ -23,6 +23,8 @@ class TimedArena extends ArenaClass {
     protected $time;
     protected $countdown;
 
+    protected $waiting;
+
     public function __construct(Arena $plugin, string $name, string $creator, string $level){
         parent::__construct($plugin, $name, $creator, $level);
         $this->type = "timed";
@@ -32,6 +34,7 @@ class TimedArena extends ArenaClass {
         $this->running = false;
         $this->max = 10;
         $this->minplayers = 2;
+        $this->waiting = false;
     }
 
     public function onJoin(Player $player) : void{
@@ -48,8 +51,12 @@ class TimedArena extends ArenaClass {
         }
     }
 
+    public function isWaiting() : bool{
+        return $this->waiting;
+    }
+
     public function canStart() : bool{
-        if($this->getPlayerCount() >= $this->getMinPlayers() && !$this->isRunning()){
+        if($this->getPlayerCount() >= $this->getMinPlayers() && !$this->isRunning() && !$this->isWaiting()){
             return true;
         }else{
             return false;
@@ -58,6 +65,7 @@ class TimedArena extends ArenaClass {
 
     public function startTimer() : void{
         $this->broadcast("&l&8[&c!&8]&r&7 Starting timer...");
+        $this->waiting = true;
         $task = new ArenaTimerTask($this->getPlugin(), $this->getPlugin()->manager, $this, $this->time, $this->countdown);
         $handler = $this->arena->getScheduler()->scheduleRepeatingTask($task, 1);
         $task->setHandler($handler);
@@ -65,9 +73,9 @@ class TimedArena extends ArenaClass {
     }
 
     public function stop() : void{
-        $this->kickAll(true, true);
-        $this->unsetRunning();
         $this->onStop();
+        $this->kickAll(true, true);
+        $this->timer->stop();
     }
 
     public function removeTimer($id) : void
@@ -95,14 +103,23 @@ class TimedArena extends ArenaClass {
 
     public function onStart() : void{
         $this->setRunning();
-        $this->broadcast("&l&8[&c!&8]&r&7 The game has begun");
+        $this->waiting = false;
+        $this->broadcast("&l&8[&c!&8]&r&7 The match has begun");
         $this->broadcastTitle("&cStart!");
         $this->broadcastStartSound();
     }
 
+    public function allowSkip() : bool{
+        return true;
+    }
+
+    public function skip() : void{
+        $this->timer->skipWait();
+    }
+
     public function onStop() : void{
         $this->broadcastTitle(TextFormat::colorize("&l&8[&c!&8]"));
-        $this->broadcastSubTitle(TextFormat::colorize("&7You are &avictorious"));
+        $this->broadcastSubTitle(TextFormat::colorize("&7The match has ended"));
     }
 
     public function onMinuteNotice(int $minutes) : void{
@@ -117,19 +134,6 @@ class TimedArena extends ArenaClass {
         $this->broadcast("&l&8[&c!&8]&r&7 Starting in &c".$seconds."&7 seconds");
     }
 
-    public function onDeath(Player $player) : void{
-        $level = $player->getLevel();
-        $pos = new Vector3($player->getX(), $player->getY()+0.5, $player->getZ());
-
-        $task = new DeathParticleTask($this, $pos, $player->getLevel());
-        $handler = $this->arena->getScheduler()->scheduleRepeatingTask($task, 1);
-        $task->setHandler($handler);
-        $this->dt[$task->getTaskId()] = true;
-
-        $level->addSound(new AnvilFallSound($pos));
-        $this->removePlayer($player, true);
-    }
-
     public function onLeave(Player $player, bool $silent = false, bool $noshowpop = false) : void{
         $player->teleport($this->arena->getServer()->getLevelByName($this->arena->cfg["spawnworld"])->getSafeSpawn());
         $player->setHealth(20);
@@ -140,13 +144,13 @@ class TimedArena extends ArenaClass {
         $player->setGamemode(1);
         if(!$noshowpop){
             $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
-            $player->addSubTitle(TextFormat::colorize("&7You got &celiminated"));
+            $player->addSubTitle(TextFormat::colorize("&7Left arena &c".$this->name));
         }
         if(!$silent){
 
             $this->broadcast("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 left the arena &8(".$this->getPlayerCount()."/".$this->getMaxPlayers().")");
         }
-        if($this->getPlayerCount() == 1){
+        if($this->getPlayerCount() <= 1 && ($this->isRunning() || $this->isWaiting())){
             $this->stop();
         }
     }
