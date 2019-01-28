@@ -35,6 +35,7 @@ blockcommands:
   - "/wild"
   - "/home"
   - "/clearinv"
+  - "/get"
 
 healthtags: true
 # /server, /spawn and /wild
@@ -55,3 +56,7 @@ servers:
 resetonjoin: true
 gotospawnonjoin: false
 novoid: true
+
+#default claim blocks
+claimblocks: 5000
+claimincome: 10

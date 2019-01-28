@@ -64,6 +64,14 @@ class ClaimManager
         return false;
     }
 
+    public function getPlayerClaims(string $player) : array{
+        if(isset($this->claims[$player])){
+            return $this->claims[$player];
+        }else{
+            return [];
+        }
+    }
+
     public function ownsPos(Position $pos, string $level, Player $player): bool
     {
         foreach ($this->claims as $key) {
@@ -133,5 +141,21 @@ class ClaimManager
         $pos1 = $this->getPos1($name);
         $this->unsetPos1($name);
         $this->addClaim($name, $pos1, $pos2, $pos2->getLevel()->getName());
+    }
+
+    public function getUsedPlayerBlocks(string $player) : int{
+        $int = 0;
+        foreach($this->getPlayerClaims($player) as $claim){
+            $int = $int+$claim->getSize();
+        }
+        return $int;
+    }
+
+    public function getTotalBlocks(string $player) : int{
+        return $this->module->players["players"][$player]["blocks"];
+    }
+
+    public function getLeftoverBlocks(string $player) : int{
+        return $this->getTotalBlocks($player) - $this->getUsedPlayerBlocks($player);
     }
 }

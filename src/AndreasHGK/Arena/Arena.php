@@ -53,6 +53,8 @@ class Arena extends PluginBase implements Listener {
     private $tpmodule;
 
     private $claims;
+    /** @var Config */
+    private $players;
     public $timeout = [];
 
     private $adminmode = [];
@@ -113,7 +115,7 @@ class Arena extends PluginBase implements Listener {
             $this->tpmodule->execute();
         }
 
-        $this->cmodule = new ClaimsModule($this, $this->manager, $this->claims);
+        $this->cmodule = new ClaimsModule($this, $this->manager, $this->claims, $this->players);
 	    $this->cmodule->execute();
 	    $this->cmodule->load();
 
@@ -140,7 +142,10 @@ class Arena extends PluginBase implements Listener {
         $this->claims = new Config($this->getDataFolder()."claims.json",Config::JSON,[
             "claims" => []
         ]);
-
+        $this->saveResource("players.json");
+        $this->players = new Config($this->getDataFolder()."players.json",Config::JSON,[
+            "players" => []
+        ]);
     }
 
     public function onJoin(PlayerJoinEvent $event){
@@ -425,6 +430,9 @@ class Arena extends PluginBase implements Listener {
     }
 
 	public function onDisable() : void{
+        foreach($this->cmodule->players["players"] as $player){
+            $this->cmodule->players["players"][$player["name"]]["online"] = false;
+        }
 	    $this->save();
 	    $this->cmodule->save();
 	}

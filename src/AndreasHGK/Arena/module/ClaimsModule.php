@@ -8,6 +8,7 @@ use AndreasHGK\Arena\Arena;
 use AndreasHGK\Arena\arena\ArenaManager;
 use AndreasHGK\Arena\claims\ClaimManager;
 use AndreasHGK\Arena\commands\ClaimsCommand;
+use AndreasHGK\Arena\task\ClaimBlocksTask;
 use Composer\Script\Event;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
@@ -17,6 +18,7 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerItemHeldEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\item\ItemIds;
 use pocketmine\level\Level;
@@ -37,6 +39,9 @@ class ClaimsModule extends ModuleBase implements Listener {
 
     public $claimscfg;
     public $claims;
+    public $playerscfg;
+    public $players;
+    public $task;
 
     private $format = [
         "pos1x" => null,
@@ -48,11 +53,13 @@ class ClaimsModule extends ModuleBase implements Listener {
         "trusted" => []
     ];
 
-    public function __construct(Arena $arena, ArenaManager $manager, Config $claimscfg)
+    public function __construct(Arena $arena, ArenaManager $manager, Config $claimscfg, Config $players)
     {
         parent::__construct($arena, $manager);
         $this->claimscfg = $claimscfg;
         $this->claims = $this->claimscfg->getAll();
+        $this->playerscfg = $players;
+        $this->players = $this->playerscfg->getAll();
     }
 
     public function execute() : void{
@@ -65,11 +72,16 @@ class ClaimsModule extends ModuleBase implements Listener {
         $cmd->setPermission("claim.command");
         $this->arena->getServer()->getCommandMap()->register("arena", $cmd, "claim");
         $this->arena->getLogger()->debug("enabled module: Claims");
+
+        $task = new ClaimBlocksTask($this->arena, $this);
+        $handler = $this->arena->getScheduler()->scheduleRepeatingTask($task, 1200);
+        $task->setHandler($handler);
+        $this->task = $task;
     }
 
     public function onSwitch(PlayerItemHeldEvent $event){
         if($event->getItem()->getId() == ItemIds::GOLDEN_SHOVEL){
-            $event->getPlayer()->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You have &cINFINITE &7claim blocks left. Destroy blocks to set claim positions."));
+            $event->getPlayer()->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You have &c".$this->claimManager->getLeftoverBlocks($event->getPlayer()->getName())." &7claim blocks left. Destroy blocks to set claim positions."));
             $this->creationmode[$event->getPlayer()->getName()] = 1;
         }elseif(isset($this->creationmode[$event->getPlayer()->getName()])){
             unset($this->creationmode[$event->getPlayer()->getName()]);
@@ -108,6 +120,7 @@ class ClaimsModule extends ModuleBase implements Listener {
                 $this->sendBlocks(BlockIds::GLOWINGOBSIDIAN, new Position($block->getX(), $block->getLevel()->getHighestBlockAt($block->getX(), $block->getZ()-1), $block->getZ()-1, $block->getLevel()));
             }elseif($this->creationmode[$player->getName()] == 2){
                 $event->setCancelled();
+                $blocks = $this->claimManager->getLeftoverBlocks($player->getName());
                 $this->arena->timeout[$player->getName()] = microtime(true) + 1;
                 $this->creationmode[$player->getName()] = 1;
                 foreach($this->getAllPositions($this->claimManager->getPos1($player->getName()), $block) as $pos){
@@ -123,6 +136,10 @@ class ClaimsModule extends ModuleBase implements Listener {
                     $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Your claim needs to by at least a 10 by 10 area"));
                     $claim->delete();
                     return;
+                }elseif($claim->getSize() > $blocks){
+                    $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have enough claim blocks to claim this"));
+                    $claim->delete();
+                    return;
                 }
                 $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 claim created"));
                 $claim->displayCorners();
@@ -135,6 +152,7 @@ class ClaimsModule extends ModuleBase implements Listener {
         if($this->isCreating($player->getName())) {
             unset($this->creationmode[$player->getName()]);
         }
+        $this->players["players"][$player->getName()]["online"] = false;
     }
 
     public function levelChange(EntityLevelChangeEvent $event) {
@@ -190,9 +208,14 @@ class ClaimsModule extends ModuleBase implements Listener {
         }
         $this->claimscfg->setAll($saves);
         $this->claimscfg->save();
+        $this->playerscfg->setAll($this->players);
+        $this->playerscfg->save();
     }
 
     public function load() : void{
+        foreach($this->players["players"] as $player){
+            $player["online"] = false;
+        }
         $this->arena->getLogger()->debug("loading claims...");
         foreach($this->claims["claims"] as $key){
             foreach($key as $claim){
@@ -206,6 +229,17 @@ class ClaimsModule extends ModuleBase implements Listener {
         }
         if(empty($this->claims["claims"])){
             $this->arena->getLogger()->debug("there are no claims to load");
+        }
+    }
+
+    public function onJoin(PlayerJoinEvent $event) {
+        $player = $event->getPlayer();
+        if(!isset($this->players["players"][$player->getName()]) || !isset($this->players["players"][$player->getName()]["name"]) || !isset($this->players["players"][$player->getName()]["online"]) || !isset($this->players["players"][$player->getName()]["blocks"])){
+            $this->players["players"][$player->getName()]["name"] = $player->getName();
+            $this->players["players"][$player->getName()]["online"] = true;
+            $this->players["players"][$player->getName()]["blocks"] = $this->arena->cfg["claimblocks"];
+        }else{
+            $this->players["players"][$player->getName()]["online"] = true;
         }
     }
 
