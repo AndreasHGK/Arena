@@ -7,13 +7,9 @@ namespace AndreasHGK\Arena\arena\modes;
 use AndreasHGK\Arena\Arena;
 use AndreasHGK\Arena\arena\ArenaClass;
 use AndreasHGK\Arena\arena\TimedArena;
+use AndreasHGK\Arena\task\ArenaTimerTask;
 use AndreasHGK\Arena\task\DeathParticleTask;
-use pocketmine\level\particle\EnchantParticle;
-use pocketmine\level\particle\ExplodeParticle;
-use pocketmine\level\particle\FlameParticle;
-use pocketmine\level\particle\HugeExplodeParticle;
-use pocketmine\level\particle\PortalParticle;
-use pocketmine\level\particle\SporeParticle;
+
 use pocketmine\level\sound\AnvilFallSound;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -27,30 +23,52 @@ class Elimination extends TimedArena {
         $this->ffa = true;
     }
 
-    public function onLeave(Player $player, bool $silent = false, bool $noshowpop = false) : void{
-        $player->teleport($this->arena->getServer()->getLevelByName($this->arena->cfg["spawnworld"])->getSafeSpawn());
-        $player->setHealth(20);
-        $player->setFood(20);
-        $player->removeAllEffects();
-        $player->getArmorInventory()->clearAll();
-        $player->getInventory()->clearAll();
-        $player->setGamemode(1);
-        if(!$noshowpop){
-            $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
-            $player->addSubTitle(TextFormat::colorize("&7You got &celiminated"));
+    public function onStop() : void{
+        $this->winnertitle("&l&8[&c!&8]");
+        $this->winnersubtitle("&7You are &avictorious");
+        foreach($this->getPlayers() as $player){
+            $player->setGamemode(0);
         }
-        if(!$silent){
-
-            $this->broadcast("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 left the arena &8(".$this->getPlayerCount()."/".$this->getMaxPlayers().")");
+        if($this->canStart()){
+            $this->startTimer();
         }
-        if($this->getPlayerCount() <= 1 && ($this->isRunning() || $this->isWaiting())){
-            $this->stop();
+        if($this->isFull()){
+            $this->timer->skipWait();
         }
     }
 
-    public function onStop() : void{
-        $this->broadcastTitle(TextFormat::colorize("&l&8[&c!&8]"));
-        $this->broadcastSubTitle(TextFormat::colorize("&7You are &avictorious"));
+    public function stop() : void{
+        $this->onStop();
+        $this->timer->stop();
+        $this->waiting = false;
+    }
+
+    public function getAlive() : array{
+        $p = [];
+        foreach($this->getPlayers() as $player){
+            if($player->getGamemode() == 0){
+                array_push($p, $player);
+            }
+        }
+        return $p;
+    }
+
+    public function winnertitle(string $txt) : void{
+        foreach($this->getAlive() as $winner){
+            $winner->addTitle(TextFormat::colorize($txt));
+        }
+    }
+
+    public function winnersubtitle(string $txt) : void{
+        foreach($this->getAlive() as $winner){
+            $winner->addSubTitle(TextFormat::colorize($txt));
+        }
+    }
+
+    public function spectate(Player $player) : void{
+        $player->setGamemode(3);
+        $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
+        $player->addSubTitle(TextFormat::colorize("&7You got &celiminated"));
     }
 
     public function onDeath(Player $player) : void{
@@ -63,7 +81,12 @@ class Elimination extends TimedArena {
         $this->dt[$task->getTaskId()] = true;
 
         $level->addSound(new AnvilFallSound($pos));
-        $this->removePlayer($player, true);
+        $this->spectate($player);
+        if(count($this->getAlive()) < 2){
+            $this->stop();
+        }elseif(empty($this->getAlive())){
+            $this->stop();
+        }
     }
 
 }

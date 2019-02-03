@@ -313,38 +313,39 @@ class Arena extends PluginBase implements Listener {
         }
     }
 
-    public function onPlace(BlockPlaceEvent $event) {
+    public function onPlace(BlockPlaceEvent $event)
+    {
         $player = $event->getPlayer();
         $block = $event->getBlock();
-        if($this->isAdminMode($player->getName())){
+        if ($this->isAdminMode($player->getName())) {
             return;
         }
         if (isset($this->timeout[$player->getName()]) && $this->timeout[$player->getName()] > microtime(true)) {
             $event->setCancelled();
             return;
         }
-        foreach($this->manager->getAll() as $arena){
-            if($arena->isActive()){
-                if($arena->isInArena($event->getBlock()) && !$arena->hasPlayer($player)){
+        foreach ($this->manager->getAll() as $arena) {
+            if ($arena->isActive()) {
+                if ($arena->isInArena($event->getBlock()) && !$arena->hasPlayer($player)) {
                     $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
                     unset($this->pos[$player->getName()]);
                     unset($this->posa[$player->getName()]);
                     $event->setCancelled();
                     $this->timeout[$player->getName()] = microtime(true) + 1;
                     return;
-                }elseif($arena->isInArena($event->getBlock()) && !$arena->isEditable()){
+                } elseif ($arena->isInArena($event->getBlock()) && !$arena->isEditable()) {
                     $event->setCancelled();
+                    $this->timeout[$player->getName()] = microtime(true) + 1;
                     $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));
                     unset($this->pos[$player->getName()]);
                     unset($this->posa[$player->getName()]);
-                    $this->timeout[$player->getName()] = microtime(true) + 1;
                     return;
-                }else{
+                } elseif ($arena->isInArena($event->getBlock()) && $arena->hasPlayer($player)) {
                     return;
                 }
             }
         }
-        if(!$this->cmodule->claimManager->canEdit($block, $block->getLevel()->getName(), $player)){
+        if (!$this->cmodule->claimManager->canEdit($block, $block->getLevel()->getName(), $player)) {
             $event->setCancelled();
             $this->timeout[$player->getName()] = microtime(true) + 1;
             $player->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't build here"));

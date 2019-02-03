@@ -29,8 +29,10 @@ class Pos2SubCommand extends SubCommand {
         }elseif($this->manager->arenaExists($this->args[1])){
             $this->arena->pos($this->sender->getName(), 2, $this->args[1]);
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Set position 2 for arena &c".$this->args[1]));
+            return;
         }else{
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
+            return;
         }
     }
 

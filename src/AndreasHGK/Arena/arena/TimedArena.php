@@ -19,7 +19,7 @@ class TimedArena extends ArenaClass {
     protected $dt = [];
 
     /** @var ArenaTimerTask */
-    protected $timer;
+    public $timer;
     protected $time;
     protected $countdown;
 
@@ -142,6 +142,11 @@ class TimedArena extends ArenaClass {
         $player->getArmorInventory()->clearAll();
         $player->getInventory()->clearAll();
         $player->setGamemode(1);
+        if($this->getPlayerCount() < $this->getMinPlayers() && !$this->isRunning() && $this->isWaiting()){
+            $this->stop();
+        }elseif($this->getPlayerCount() <= 1 && ($this->isRunning() || $this->isWaiting())){
+            $this->stop();
+        }
         if(!$noshowpop){
             $player->addTitle(TextFormat::colorize("&l&8[&c!&8]"));
             $player->addSubTitle(TextFormat::colorize("&7Left arena &c".$this->name));
@@ -149,9 +154,6 @@ class TimedArena extends ArenaClass {
         if(!$silent){
 
             $this->broadcast("&l&8[&c!&8]&r&7 Player &c".$player->getName()."&7 left the arena &8(".$this->getPlayerCount()."/".$this->getMaxPlayers().")");
-        }
-        if($this->getPlayerCount() <= 1 && ($this->isRunning() || $this->isWaiting())){
-            $this->stop();
         }
     }
 

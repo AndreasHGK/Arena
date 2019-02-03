@@ -51,6 +51,7 @@ class ListSubCommand extends SubCommand {
             return;
         }
         $this->sender->sendMessage(TextFormat::colorize($str));
+        return;
     }
 
 }
