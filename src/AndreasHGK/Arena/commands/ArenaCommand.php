@@ -60,6 +60,15 @@ class ArenaCommand implements CommandExecutor {
                     $cmd->execute();
                     return true;
                     break;
+                case "owned":
+                    if(!$sender->hasPermission("arena.play")){
+                        $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));
+                        return true;
+                    }
+                    $cmd = new OwnedSubCommand($this->plugin, $sender, $args, $this->manager);
+                    $cmd->execute();
+                    return true;
+                    break;
                 case "create":
                     if(!$sender->hasPermission("arena.create")){
                         $sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You don't have permission to execute this command"));

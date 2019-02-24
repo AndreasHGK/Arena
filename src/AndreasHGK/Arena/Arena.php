@@ -12,6 +12,7 @@ use AndreasHGK\Arena\module\TeleportModule;
 use AndreasHGK\Arena\task\AutoSaveTask;
 use Ds\Vector;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\level\ChunkLoadEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerJoinEvent;

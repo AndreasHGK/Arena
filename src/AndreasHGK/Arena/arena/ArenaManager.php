@@ -68,6 +68,46 @@ class ArenaManager{
         return $arenas;
     }
 
+    public function getAllOwned(string $player) : array{
+        $arenas = [];
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 2 && $arena->getCreator() == $player){
+                array_push($arenas, $arena);
+            }
+        }
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 1 && $arena->getCreator() == $player){
+                array_push($arenas, $arena);
+            }
+        }
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 0 && $arena->getCreator() == $player){
+                array_push($arenas, $arena);
+            }
+        }
+        return $arenas;
+    }
+
+    public function getAllActive() : array{
+        $arenas = [];
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 2 && $arena->isActive()){
+                array_push($arenas, $arena);
+            }
+        }
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 1 && $arena->isActive()){
+                array_push($arenas, $arena);
+            }
+        }
+        foreach($this->arenas as $arena){
+            if($arena->getStatus() == 0 && $arena->isActive()){
+                array_push($arenas, $arena);
+            }
+        }
+        return $arenas;
+    }
+
     public function getArena(string $name){
         if(isset($this->arenas[$name])){
             return $this->arenas[$name];

@@ -11,7 +11,7 @@ use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class ListSubCommand extends SubCommand {
+class OwnedSubCommand extends SubCommand {
 
     protected $manager;
     private $pagesize = 10;
@@ -29,12 +29,12 @@ class ListSubCommand extends SubCommand {
         }else{
             $page = $this->args[1];
         }
-        $pages = floor(count($this->manager->getAllActive())/10)+1;
-        $str1 = "&l&8[&c!&8]&r&7 List of activated arenas (page ".$page." of ".$pages."):";
+        $pages = floor(count($this->manager->getAllOwned($this->sender->getName()))/10)+1;
+        $str1 = "&l&8[&c!&8]&r&7 List of owned arenas (page ".$page." of ".$pages."):";
         $start = $this->pagesize*($page)-$this->pagesize;
         $int = 0;
         $empty = true;
-        foreach($this->manager->getAllActive() as $arena){
+        foreach($this->manager->getAllOwned($this->sender->getName()) as $arena){
             if($int >= $start && $int < $start+$this->pagesize){
                 if($int == $start){
                     $str = "&8&l> ";

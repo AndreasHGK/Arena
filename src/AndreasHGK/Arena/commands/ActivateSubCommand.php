@@ -25,14 +25,14 @@ class ActivateSubCommand extends SubCommand {
             $arena = $this->args[1];
             if ($this->manager->arenaExists($arena)) {
                 $arena = $this->manager->getArena($arena);
-                if(null !== $arena->getPos1() || null !== $arena->getPos2() || !empty($arena->getSpawns())){
+                if(!$arena->pos1Isset() || !$arena->pos2Isset() || empty($arena->getSpawns())){
                     $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 You can't activate an arena that is not fully set up"));
                     return;
                 }
                 $arena->activate();
                 $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Activated arena &c".$arena->getName()));
             }else{
-                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 There is already an arena with that name"));
+                $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 That arena doesn't exist"));
             }
         }else{
             $this->sender->sendMessage(TextFormat::colorize("&l&8[&c!&8]&r&7 Some arguments are missing"));
